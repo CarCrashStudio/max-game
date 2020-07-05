@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public enum EntityState { WALK, ATTACK, STAGGER, IDLE }
+public enum EntityState { WALK, ATTACK, STAGGER, IDLE, INTERACTING }
 public class Entity : MonoBehaviour
 {
     public EntityState currentState;

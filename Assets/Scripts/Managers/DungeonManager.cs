@@ -8,19 +8,16 @@ using UnityEngine;
 
 public class DungeonManager : MonoBehaviour
 {
+    public float iconSize = 1;
     public int dungeonSeed = 0;
     public Camera mainCamera;
     private RoomManager roomManager { get { return GetComponent <RoomManager>(); } }
 
     DungeonGeneration.DungeonGeneration<GameObject> generation;
 
-    [SerializeField]
-    private UnityEngine.Vector2 cameraClampMin { get { return mainCamera.GetComponent<CameraMovement>().minClamp; } }
-    [SerializeField]
-    private UnityEngine.Vector2 cameraClampMax { get { return mainCamera.GetComponent<CameraMovement>().maxClamp; } }
+    private GameObject[] rooms;
 
-    public GameObject[] rooms;
-
+    [Header("Tile Masters")]
     public GameObject northWall;
     public GameObject southWall;
     public GameObject eastWall;
@@ -38,16 +35,23 @@ public class DungeonManager : MonoBehaviour
 
     public GameObject floor;
 
+    //public GameObject largeChest;
+    public GameObject smallChest;
+
     public GameObject roomTemplate;
 
-    public float iconSize = 1;
+    [Header("Spawnables")]
+    public LootTable[] spawnableLoot;
 
+    [Header("Minimum/Maximum Values")]
     public int minimumRoomWidth = 5;
     public int maximumRoomWidth = 5;
     public int minimumRoomHeight = 5;
     public int maximumRoomHeight = 5;
     public int minimumRoomCount = 1;
     public int maximumRoomCount = 5;
+    public int minimumLootChestsPerRoom = 1;
+    public int maximumLootChestsPerRoom = 2;
 
     public bool autoUpdate = false;
     public void GenerateRandomSeed ()
@@ -63,9 +67,9 @@ public class DungeonManager : MonoBehaviour
     {
         try
         {
-            generation = new DungeonGeneration<GameObject>(northWall, southWall, eastWall, westWall, northwestCorner, northeastCorner, southwestCorner, southeastCorner, northDoor, southDoor, eastDoor, westDoor, floor, dungeonSeed);
+            generation = new DungeonGeneration<GameObject>(northWall, southWall, eastWall, westWall, northwestCorner, northeastCorner, southwestCorner, southeastCorner, northDoor, southDoor, eastDoor, westDoor, floor, smallChest, dungeonSeed);
 
-            Room<GameObject> room = generation.BuildDungeon(new DungeonGeneration.Vector2(0, 0), new DungeonGeneration.Vector2(minimumRoomWidth, maximumRoomWidth), new DungeonGeneration.Vector2(minimumRoomHeight, maximumRoomHeight), new DungeonGeneration.Vector2(minimumRoomCount, maximumRoomCount));
+            Room<GameObject> room = generation.BuildDungeon(new DungeonGeneration.Vector2(0, 0), new DungeonGeneration.Vector2(minimumRoomWidth, maximumRoomWidth), new DungeonGeneration.Vector2(minimumRoomHeight, maximumRoomHeight), new DungeonGeneration.Vector2(minimumRoomCount, maximumRoomCount), new DungeonGeneration.Vector2(minimumLootChestsPerRoom, maximumLootChestsPerRoom));
             List<Room<GameObject>> rooms = new List<Room<GameObject>>();
             rooms = rooms.OrderBy(r => r.ID).ToList();
             room.GetRooms(ref rooms);
@@ -113,15 +117,32 @@ public class DungeonManager : MonoBehaviour
             roomT.tag = "room";
             roomT.transform.position = new UnityEngine.Vector2(roomT.GetComponent<Room>().roomPos.x, -roomT.GetComponent<Room>().roomPos.y);
 
+            // draw all base tiles
             for (int y = room.Origin.Y; y < room.Height + room.Origin.Y; y++)
             {
                 for (int x = room.Origin.X; x < room.Width + room.Origin.X; x++)
                 {
-                    GameObject tile = Instantiate(room.Tiles[(x - room.Origin.X) + (y - room.Origin.Y) * room.Width], roomT.transform);
+                    var index = (x - room.Origin.X) + (y - room.Origin.Y) * room.Width;
+                    GameObject tile = Instantiate(room.Tiles[index], roomT.transform);
 
                     tile.transform.position = new UnityEngine.Vector2((x * iconSize) + (iconSize / 2), -(y * iconSize) - (iconSize / 2));
                 }
             }
+            // draw all world objects above the base tiles
+            for (int y = room.Origin.Y; y < room.Height + room.Origin.Y; y++)
+            {
+                for (int x = room.Origin.X; x < room.Width + room.Origin.X; x++)
+                {
+                    var index = (x - room.Origin.X) + (y - room.Origin.Y) * room.Width;
+                    if (room.WorldObjects[index] != null)
+                    {
+                        GameObject tile = Instantiate(room.WorldObjects[index], roomT.transform);
+                        tile.transform.position = new UnityEngine.Vector2((x * iconSize) + (iconSize / 2), -(y * iconSize) - (iconSize / 2));
+                    }
+
+                }
+            }
+
             room.Root = roomT;
             this.rooms[i] = roomT;
             i++;
@@ -138,7 +159,7 @@ public class DungeonManager : MonoBehaviour
         try
         {
             // get a list of all door objects
-            var doors = room.Tiles.Where(t => t == northDoor || t == southDoor || t == eastDoor || t == westDoor).ToList();
+            var doors = room.WorldObjects.Where(t => t == northDoor || t == southDoor || t == eastDoor || t == westDoor).ToList();
 
             // set tart clamps, target rooms, and other info
             foreach (var door in doors)
@@ -171,10 +192,58 @@ public class DungeonManager : MonoBehaviour
                     door.GetComponent<SceneChange>().playerChange = new UnityEngine.Vector2(-5, 0);
                     door.GetComponent<SceneChange>().cameraChange = new UnityEngine.Vector2(-room.ToEast.Width, 0);
                 }
-                Debug.Log("HIT");
             }
         }
         catch(Exception ex)
+        {
+            Debug.LogError($"{ex.Message}\n{ex.StackTrace}");
+        }
+    }
+    public void FindChests(Room<GameObject> room)
+    {
+        try
+        {
+            // get a list of all door objects
+            var chests = room.WorldObjects.Where(t => t == smallChest).ToList();
+
+            // check if the canvas object has already been created and find it
+            var canvas = GameObject.FindObjectOfType<Canvas>();
+                    Debug.Log(canvas);
+
+
+            // set tart clamps, target rooms, and other info
+            foreach (var chest in chests)
+            {
+                // target rooms depends on which door type this is
+                if (chest.GetComponent<Chest>().type == ChestType.SMALL)
+                    chest.GetComponent<Chest>().inventory = new InventoryItem[3];
+                else if (chest.GetComponent<Chest>().type == ChestType.LARGE)
+                    chest.GetComponent<Chest>().inventory = new InventoryItem[6];
+
+                if (canvas != null)
+                {
+                    Debug.Log("We hit");
+                    var obj = Instantiate(chest.GetComponent<Chest>().chestUI);
+                    obj.transform.parent = canvas.transform;
+                }
+
+                for (int i = 0; i < chest.GetComponent<Chest>().inventory.Length; i++)
+                {
+                    //choose a random loot table to pick from
+                    int tableI = UnityEngine.Random.Range(0, spawnableLoot.Length - 1);
+                    LootTable table = spawnableLoot[tableI];
+
+                    // get a random loot object from a loot table
+                    var loot = table.GetLoot();
+                    if (loot != null)
+                    {
+                        chest.GetComponent<Chest>().inventory[i].item = loot.item;
+                        chest.GetComponent<Chest>().inventory[i].quantity = loot.quantity;
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
         {
             Debug.LogError($"{ex.Message}\n{ex.StackTrace}");
         }
@@ -185,14 +254,5 @@ public class DungeonManager : MonoBehaviour
         for (int j = 10; j >= 0; j--)
             for(int i = 0; i < transform.childCount; i++)
                 DestroyImmediate(transform.GetChild(i).gameObject);
-    }
-
-    void Start()
-    {
-        //roomManager.ChangeRoom(rooms[0]);
-    }
-    void Update()
-    {
-        
     }
 }

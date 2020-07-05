@@ -1,13 +1,13 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
 public abstract class Item : MonoBehaviour
 {
-    public Signal healthSignal;
-
     [Header("Details")]
-    public string itemName;
+    public string name;
     public string pluralName;
     public float cost;
 

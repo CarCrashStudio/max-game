@@ -5,7 +5,8 @@ using UnityEngine;
 [System.Serializable]
 public class Loot
 {
-    public GameObject item;
+    public InventoryItem item;
+    [Range(0,1)]
     public float lootChance;
 }
 
@@ -14,7 +15,7 @@ public class LootTable : ScriptableObject
 {
     public Loot[] loots;
 
-    public GameObject GetLoot ()
+    public InventoryItem GetLoot ()
     {
         float currentChance = Random.Range(0, 1);
         for (int i = 0; i < loots.Length; i++)

@@ -30,7 +30,8 @@ namespace DungeonGeneration
         private Room<T> to_west = null;
 
         public int ID { get { return id; } set { id = value; } }
-        public List<T> Tiles { get; set; }
+        public List<T> Tiles { get; set; } = new List<T>();
+        public List<T> WorldObjects { get; set; } = new List<T>();
         public byte AttachedRoomCount
         {
             get
@@ -99,6 +100,7 @@ namespace DungeonGeneration
     public class DungeonGeneration<T>
     {
         #region MODEL_CONSTANTS
+        #region TILES
         private T NORTH_WALL { get; set; }
         private T SOUTH_WALL { get; set; }
         private T EAST_WALL { get; set; }
@@ -110,14 +112,20 @@ namespace DungeonGeneration
         private T SOUTHEAST_CORNER { get; set; }
 
         private T FLOOR { get; set; }
-
+        #endregion
+        #region WORLD_OBJECTS
         private T NORTH_DOOR { get; set; }
         private T SOUTH_DOOR { get; set; }
         private T EAST_DOOR { get; set; }
         private T WEST_DOOR { get; set; }
+
+        private T SMALL_CHEST { get; set; }
+        #endregion
         #endregion
 
         Random rand;
+
+        int chestMin = 0, chestMax = 0;
 
         /// <summary>
         /// Initializes all model constant values for Walls/Corners/Floors/Etc.
@@ -134,7 +142,7 @@ namespace DungeonGeneration
         public DungeonGeneration(T northWall, T southWall, T eastWall, T westWall,
                                   T northwestCorner, T northeastCorner, T southwestCorner, T southeastCorner,
                                   T northDoor, T southDoor, T eastDoor, T westDoor,
-                                  T floor, int seed = 0)
+                                  T floor, T smallChest, int seed = 0)
         {
             NORTH_WALL = northWall;
             SOUTH_WALL = southWall;
@@ -153,12 +161,17 @@ namespace DungeonGeneration
             EAST_DOOR = eastDoor;
             WEST_DOOR = westDoor;
 
+            SMALL_CHEST = smallChest;
+
             rand = new Random(seed);
         }
 
-        public Room<T> BuildDungeon(Vector2 origin, Vector2 width, Vector2 height, Vector2 rooms)
+        public Room<T> BuildDungeon(Vector2 origin, Vector2 width, Vector2 height, Vector2 rooms, Vector2 chests)
         {
             List<T> temp = new List<T>();
+
+            chestMin = chests.X;
+            chestMax = chests.Y;
 
             if (rooms.X < 1) rooms.X = 1;
             Room<T> room = new Room<T>(origin, 0, 0);
@@ -239,10 +252,14 @@ namespace DungeonGeneration
             SetAdjacency(roomNum, roomDir, ref room, ref lastRoom);
             room.Tiles = temp;
             room.ID = roomNum;
+            PrepareWorldObjects(room.Tiles.Count, room.WorldObjects);
 
             //Generate door for this room and respective door in last room
             if (roomNum != 1)
-                placeDoors(startX, startY, roomWidth, roomHeight, doorX, doorY, lastRoom, roomDir, room.Tiles);
+                placeDoors(startX, startY, roomWidth, roomHeight, doorX, doorY, lastRoom, roomDir, room.WorldObjects);
+
+            // generate loot chests and place down
+            placeChests(startX, startY, roomWidth, roomHeight, room.WorldObjects);
 
             var availability = FindAvailability(room);
             int roomsToAdd = rand.Next(0, availability.Count);
@@ -257,11 +274,13 @@ namespace DungeonGeneration
                 maxRoomNum = BuildRoom(i + maxRoomNum, maxRooms, startX, startY, minWidth, maxWidth, minHeight, maxHeight, ref room, dir);
             }
 
-
-
             return maxRoomNum;
         }
-
+        private void PrepareWorldObjects (int count, List<T> worldObjects)
+        {
+            for (int i = 0; i < count; i++)
+                worldObjects.Add(default);
+        }
         private void SetAdjacency(int roomNum, CardinalDirections roomDir, ref Room<T> room, ref Room<T> lastRoom)
         {
             if (roomNum != 1)
@@ -399,26 +418,45 @@ namespace DungeonGeneration
         }
 
         public enum CardinalDirections { NORTH, SOUTH, EAST, WEST }
-        private void placeDoors(int startX, int startY, int roomWidth, int roomHeight, int doorX, int doorY, Room<T> lastRoom, CardinalDirections side, List<T> tiles)
+        private void placeDoors(int startX, int startY, int roomWidth, int roomHeight, int doorX, int doorY, Room<T> lastRoom, CardinalDirections side, List<T> worldObjects)
         {
             switch (side)
             {
                 case CardinalDirections.NORTH:
-                    lastRoom.Tiles[(doorX - lastRoom.Origin.X) + (lastRoom.Height - 1) * roomWidth] = NORTH_DOOR;
-                    tiles[(doorX - startX) + (doorY - startY) * roomWidth] = SOUTH_DOOR;
+                    lastRoom.WorldObjects[(doorX - lastRoom.Origin.X) + (lastRoom.Height - 1) * roomWidth] = NORTH_DOOR;
+                    worldObjects[(doorX - startX) + (doorY - startY) * roomWidth] = SOUTH_DOOR;
                     break;
                 case CardinalDirections.SOUTH:
-                    lastRoom.Tiles[(doorX - lastRoom.Origin.X) + (lastRoom.Height - 1) * roomWidth] = SOUTH_DOOR;
-                    tiles[(doorX - startX) + (doorY - startY) * roomWidth] = NORTH_DOOR;
+                    lastRoom.WorldObjects[(doorX - lastRoom.Origin.X) + (lastRoom.Height - 1) * roomWidth] = SOUTH_DOOR;
+                    worldObjects[(doorX - startX) + (doorY - startY) * roomWidth] = NORTH_DOOR;
                     break;
                 case CardinalDirections.EAST:
-                    lastRoom.Tiles[(lastRoom.Width - 1) + (doorY - lastRoom.Origin.Y) * roomWidth] = EAST_DOOR;
-                    tiles[(doorX - startX) + (doorY - startY) * roomWidth] = WEST_DOOR;
+                    lastRoom.WorldObjects[(lastRoom.Width - 1) + (doorY - lastRoom.Origin.Y) * roomWidth] = EAST_DOOR;
+                    worldObjects[(doorX - startX) + (doorY - startY) * roomWidth] = WEST_DOOR;
                     break;
                 case CardinalDirections.WEST:
-                    lastRoom.Tiles[(lastRoom.Width - 1) + (doorY - lastRoom.Origin.Y) * roomWidth] = WEST_DOOR;
-                    tiles[(doorX - startX) + (doorY - startY) * roomWidth] = EAST_DOOR;
+                    lastRoom.WorldObjects[(lastRoom.Width - 1) + (doorY - lastRoom.Origin.Y) * roomWidth] = WEST_DOOR;
+                    worldObjects[(doorX - startX) + (doorY - startY) * roomWidth] = EAST_DOOR;
                     break;
+            }
+        }
+        private void placeChests (int startX, int startY, int roomWidth, int roomHeight, List<T> worldObjects)
+        {
+            try
+            {
+                int chestX = 0, chestY = 0, chestCount = 0;
+                chestCount = rand.Next(chestMin, chestMax);
+                for (int i = 0; i < chestCount; i++)
+                {
+                    chestX = rand.Next(startX + 1, roomWidth - 1);
+                    chestY = rand.Next(startY + 1, roomHeight - 1);
+
+                    worldObjects[(chestX - startX) + (chestY - startY) * roomWidth] = SMALL_CHEST;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
     }

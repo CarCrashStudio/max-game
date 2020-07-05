@@ -1,9 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public enum EquipmentType { ARMOR, WEAPON }
 public enum EquipmentSlot { HEAD, TORSO, LEGS, BOOT, ARMS, MAINHAND }
+[Serializable]
 public class Equipment : Item
 {
     public EquipmentType type;

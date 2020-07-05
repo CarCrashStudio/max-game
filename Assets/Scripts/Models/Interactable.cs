@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Interactable : MonoBehaviour
+public abstract class Interactable : MonoBehaviour
 {
-    [SerializeField]
-    protected bool entered;
+    public bool entered;
+    protected bool active;
     // Start is called before the first frame update
     void Start()
     {
@@ -31,4 +31,6 @@ public class Interactable : MonoBehaviour
             entered = false;
         }
     }
+
+    public abstract void Interact();
 }

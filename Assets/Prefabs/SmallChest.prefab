@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 2108226028043237102}
   - component: {fileID: 6585913949607580171}
   - component: {fileID: 1150036901511235087}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: SmallChest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -54,6 +54,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  chestUI: {fileID: 2035673148485643014, guid: 6875e212c387e9449bd0bef22b127f67, type: 3}
 --- !u!212 &7768143961397594373
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -92,7 +93,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 1753205982242350755, guid: 9abbf731744f8274890aecbf20fb54ea,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
