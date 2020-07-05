@@ -17,14 +17,20 @@ public class Chest : Interactable
         {
             var grid = chestUI.transform.GetChild(0);
 
-            Debug.Log(grid);
             for (int i = grid.transform.childCount - 1; i >= inventory.Length; i--)
                 grid.transform.GetChild(i).gameObject.SetActive(false);
 
             for (int i = 0; i < inventory.Length; i++)
             {
-                var cell = grid.transform.GetChild(i).gameObject;
-                cell.transform.GetChild(1).GetComponent<Text>().text = (inventory[i] != null) ? inventory[i].quantity.ToString() : "";
+                try
+                {
+                    var cell = grid.transform.GetChild(i).gameObject;
+                    cell.transform.GetChild(1).GetComponent<Text>().text = (inventory[i] != null) ? inventory[i].quantity.ToString() : "";
+                    cell.transform.GetChild(0).GetComponent<Image>().sprite = inventory[i].item.GetComponent<SpriteRenderer>().sprite;
+
+                    cell.transform.GetChild(0).gameObject.SetActive(inventory[i] != null);
+                }
+                catch { }
             }
 
             active = true;

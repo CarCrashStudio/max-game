@@ -37,6 +37,7 @@ public class DungeonManager : MonoBehaviour
 
     //public GameObject largeChest;
     public GameObject smallChest;
+    public GameObject chestUI;
 
     public GameObject roomTemplate;
 
@@ -85,9 +86,8 @@ public class DungeonManager : MonoBehaviour
         var pos = rooms[0].GetComponent<Room>().roomPos;
         var size = rooms[0].GetComponent<Room>().roomSize;
 
-        mainCamera.orthographicSize = (size.y / 2) / 2;
-        float height = Mathf.Round(2f * mainCamera.orthographicSize);
-        float width = Mathf.Round(height * mainCamera.aspect);
+        float height = Mathf.Round(2f * mainCamera.orthographicSize / mainCamera.rect.height);
+        float width = Mathf.Round(height * mainCamera.aspect / mainCamera.rect.width);
 
         UnityEngine.Vector2 min = new UnityEngine.Vector2(pos.x + (size.x - Mathf.Round(width / 2)), pos.y - Mathf.Round(height / 2));
         UnityEngine.Vector2 max = new UnityEngine.Vector2(pos.x + Mathf.Round(width / 2), pos.y - (size.y - Mathf.Round(height / 2)));
@@ -148,7 +148,10 @@ public class DungeonManager : MonoBehaviour
             i++;
         }
         foreach (var room in rooms)
+        {
             FindDoors(room);
+            FindChests(room);
+        }
 
         roomManager.startingRoom = this.rooms[0];
         SetCameraPos();
@@ -208,7 +211,7 @@ public class DungeonManager : MonoBehaviour
 
             // check if the canvas object has already been created and find it
             var canvas = GameObject.FindObjectOfType<Canvas>();
-                    Debug.Log(canvas);
+            Debug.Log(canvas);
 
 
             // set tart clamps, target rooms, and other info
@@ -220,15 +223,19 @@ public class DungeonManager : MonoBehaviour
                 else if (chest.GetComponent<Chest>().type == ChestType.LARGE)
                     chest.GetComponent<Chest>().inventory = new InventoryItem[6];
 
-                if (canvas != null)
+                chest.GetComponent<Chest>().chestUI = chestUI;
+
+                //if (canvas != null)
+                //{
+                //    var obj = Instantiate(chest.GetComponent<Chest>().chestUI);
+                //    obj.SetActive(false);
+                //    obj.transform.position = Vector3.zero;
+                //    obj.transform.SetParent(canvas.transform);
+                //}
+
+                for (int i = 0; i < chest.GetComponent<Chest>().inventory.Length - 1; i++)
                 {
                     Debug.Log("We hit");
-                    var obj = Instantiate(chest.GetComponent<Chest>().chestUI);
-                    obj.transform.parent = canvas.transform;
-                }
-
-                for (int i = 0; i < chest.GetComponent<Chest>().inventory.Length; i++)
-                {
                     //choose a random loot table to pick from
                     int tableI = UnityEngine.Random.Range(0, spawnableLoot.Length - 1);
                     LootTable table = spawnableLoot[tableI];
@@ -237,6 +244,7 @@ public class DungeonManager : MonoBehaviour
                     var loot = table.GetLoot();
                     if (loot != null)
                     {
+                        chest.GetComponent<Chest>().inventory[i] = new InventoryItem();
                         chest.GetComponent<Chest>().inventory[i].item = loot.item;
                         chest.GetComponent<Chest>().inventory[i].quantity = loot.quantity;
                     }

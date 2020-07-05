@@ -17,10 +17,14 @@ public class LootTable : ScriptableObject
 
     public InventoryItem GetLoot ()
     {
-        float currentChance = Random.Range(0, 1);
+        float currentChance = Random.Range(0, 1), lootChance = 0;
         for (int i = 0; i < loots.Length; i++)
-            if (currentChance <= loots[i].lootChance)
+        {
+            lootChance += loots[i].lootChance;
+            if (currentChance <= lootChance)
                 return loots[i].item;
+        }
+            
         return null;
     }
 }
