@@ -10,7 +10,6 @@ using UnityEngine;
 public enum EquipmentSlots { HEAD, TORSO, LEGS, BOOTS, ARMS, WEAPON_MAIN, WEAPON_OFF };
 public class MaxAttributes : Entity
 {
-
     public float speed = 16f;
 
     // Start is called before the first frame update
@@ -30,9 +29,12 @@ public class MaxAttributes : Entity
         {
             StartCoroutine(AttackCo());
         }
+        else if (Input.GetButtonDown("interact") && (currentState == EntityState.IDLE || currentState == EntityState.WALK))
+        {
+
+        }
         else if ((currentState == EntityState.WALK || currentState == EntityState.IDLE) && velocity != Vector2.zero)
         {
-            //Debug.Log("Current Velocity: " + velocity.ToString());
             myRigidBody.position += velocity * speed * Time.deltaTime;
 
             animator.SetFloat("Horizontal", velocity.x);

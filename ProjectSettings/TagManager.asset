@@ -8,6 +8,7 @@ TagManager:
   - Hitbox
   - enemy
   - breakable
+  - interactable
   layers:
   - Default
   - TransparentFX
@@ -17,8 +18,8 @@ TagManager:
   - UI
   - 
   - 
+  - Objects
   - Player
-  - 
   - 
   - 
   - 
