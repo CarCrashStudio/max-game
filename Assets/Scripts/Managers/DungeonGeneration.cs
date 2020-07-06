@@ -1,10 +1,24 @@
-﻿using System;
+﻿/* DUNGEON GENERATION
+ * Author: Trey Hall
+ * 
+ * This API can be used to procedurally generate a series of rooms to form a dungeon, 
+ * similar to Binding of Isaac
+ * 
+ * TODO:
+ * Add option to generate mazes inside of rooms
+ * Add option to generate hallways between rooms
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 namespace DungeonGeneration
 {
+    /// <summary>
+    /// Vector2 is a class containing an x and y value pair
+    /// </summary>
     public struct Vector2
     {
         private int x, y;
@@ -12,6 +26,11 @@ namespace DungeonGeneration
         {
             this.x = x;
             this.y = y;
+        }
+        public Vector2(float x, float y)
+        {
+            this.x = (int)x;
+            this.y = (int)y;
         }
 
         public int X { get { return x; } set { x = value; } }

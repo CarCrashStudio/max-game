@@ -6,12 +6,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 
+[Serializable]
 public class DungeonManager : MonoBehaviour
 {
     public float iconSize = 1;
     public int dungeonSeed = 0;
     public Camera mainCamera;
-    private RoomManager roomManager { get { return GetComponent <RoomManager>(); } }
+
+    private RoomManager roomManager = new RoomManager();
 
     DungeonGeneration.DungeonGeneration<GameObject> generation;
 
@@ -45,15 +47,12 @@ public class DungeonManager : MonoBehaviour
     public LootTable[] spawnableLoot;
 
     [Header("Minimum/Maximum Values")]
-    public int minimumRoomWidth = 5;
-    public int maximumRoomWidth = 5;
-    public int minimumRoomHeight = 5;
-    public int maximumRoomHeight = 5;
-    public int minimumRoomCount = 1;
-    public int maximumRoomCount = 5;
-    public int minimumLootChestsPerRoom = 1;
-    public int maximumLootChestsPerRoom = 2;
+    public UnityEngine.Vector2 roomWidth = new UnityEngine.Vector2(5, 5);
+    public UnityEngine.Vector2 roomHeight = new UnityEngine.Vector2(5, 5);
+    public UnityEngine.Vector2 roomCount = new UnityEngine.Vector2(5, 5);
+    public UnityEngine.Vector2 chestCount = new UnityEngine.Vector2(1, 2);
 
+    [Header("Editor Properties")]
     public bool autoUpdate = false;
     public void GenerateRandomSeed ()
     {
@@ -68,9 +67,22 @@ public class DungeonManager : MonoBehaviour
     {
         try
         {
+            if (roomWidth.x > roomWidth.y)
+                roomWidth.y = roomWidth.x;
+            if (roomHeight.x > roomHeight.y)
+                roomHeight.y = roomHeight.x;
+            if (roomCount.x > roomCount.y)
+                roomCount.y = roomCount.x;
+            if (chestCount.x > chestCount.y)
+                chestCount.y = chestCount.x;
+
             generation = new DungeonGeneration<GameObject>(northWall, southWall, eastWall, westWall, northwestCorner, northeastCorner, southwestCorner, southeastCorner, northDoor, southDoor, eastDoor, westDoor, floor, smallChest, dungeonSeed);
 
-            Room<GameObject> room = generation.BuildDungeon(new DungeonGeneration.Vector2(0, 0), new DungeonGeneration.Vector2(minimumRoomWidth, maximumRoomWidth), new DungeonGeneration.Vector2(minimumRoomHeight, maximumRoomHeight), new DungeonGeneration.Vector2(minimumRoomCount, maximumRoomCount), new DungeonGeneration.Vector2(minimumLootChestsPerRoom, maximumLootChestsPerRoom));
+            Room<GameObject> room = generation.BuildDungeon(new DungeonGeneration.Vector2(0, 0), 
+                                                            new DungeonGeneration.Vector2(roomWidth.x, roomWidth.y), 
+                                                            new DungeonGeneration.Vector2(roomHeight.x, roomHeight.y), 
+                                                            new DungeonGeneration.Vector2(roomCount.x, roomCount.y), 
+                                                            new DungeonGeneration.Vector2(chestCount.x, chestCount.y));
             List<Room<GameObject>> rooms = new List<Room<GameObject>>();
             rooms = rooms.OrderBy(r => r.ID).ToList();
             room.GetRooms(ref rooms);
@@ -91,6 +103,10 @@ public class DungeonManager : MonoBehaviour
 
         UnityEngine.Vector2 min = new UnityEngine.Vector2(pos.x + (size.x - Mathf.Round(width / 2)), pos.y - Mathf.Round(height / 2));
         UnityEngine.Vector2 max = new UnityEngine.Vector2(pos.x + Mathf.Round(width / 2), pos.y - (size.y - Mathf.Round(height / 2)));
+        if (min.x < pos.x)
+            min.x = pos.x;
+        if (min.y > pos.y)
+            min.y = pos.y;
 
         //if (min.x >= max.x && min.y > max.y)
         //{
@@ -154,7 +170,6 @@ public class DungeonManager : MonoBehaviour
         }
 
         roomManager.startingRoom = this.rooms[0];
-        SetCameraPos();
     }
 
     public void FindDoors(Room<GameObject> room)

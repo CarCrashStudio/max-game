@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System;
 
+[Serializable]
 public class RoomManager : MonoBehaviour
 {
     public GameObject startingRoom;

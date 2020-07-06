@@ -30,7 +30,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4281387767692813137}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.5, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -51,9 +51,12 @@ MonoBehaviour:
   entered: 0
   type: 0
   inventory:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - item: {fileID: 0}
+    quantity: 0
+  - item: {fileID: 0}
+    quantity: 0
+  - item: {fileID: 0}
+    quantity: 0
   chestUI: {fileID: 2035673148485643014, guid: 6875e212c387e9449bd0bef22b127f67, type: 3}
 --- !u!212 &7768143961397594373
 SpriteRenderer:
@@ -138,7 +141,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.033786774, y: 0.059126377}
+  m_Offset: {x: 0.011464596, y: 0.003432393}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -149,7 +152,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.86992645, y: 0.88174725}
+  m_Size: {x: 0.9604292, y: 0.9931352}
   m_EdgeRadius: 0
 --- !u!50 &6585913949607580171
 Rigidbody2D:
@@ -185,7 +188,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.033786774, y: -0.6662679}
+  m_Offset: {x: 0.011464596, y: -0.72544265}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -196,5 +199,5 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.86992645, y: 0.5840845}
+  m_Size: {x: 0.9604292, y: 0.46573496}
   m_EdgeRadius: 0

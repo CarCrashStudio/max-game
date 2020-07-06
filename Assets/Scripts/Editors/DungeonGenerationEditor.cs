@@ -17,6 +17,7 @@ public class DungeonGenerationEditor : Editor
             {
                 dungeonGen.DestroyMap();
                 dungeonGen.GenerateMap();
+                dungeonGen.SetCameraPos();
             }
         }
         if (GUILayout.Button("Generate Dungeon Seed"))
@@ -27,6 +28,7 @@ public class DungeonGenerationEditor : Editor
         {
             dungeonGen.DestroyMap();
             dungeonGen.GenerateMap();
+            dungeonGen.SetCameraPos();
         }
         if (GUILayout.Button("Destroy"))
         {
