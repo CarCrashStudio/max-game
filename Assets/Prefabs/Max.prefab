@@ -196,6 +196,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1175258850962916302}
   - component: {fileID: 1175258850962916292}
+  - component: {fileID: 6933523599634105306}
   - component: {fileID: 1175258850962916303}
   - component: {fileID: 1175258850962916288}
   - component: {fileID: 1175258850962916290}
@@ -249,6 +250,19 @@ MonoBehaviour:
   wisdom: 10
   intelligence: 10
   speed: 4
+  gold: 5
+--- !u!114 &6933523599634105306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1175258850962916293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1fc0007dc96f5034495c5e2a733a3452, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!212 &1175258850962916303
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -286,7 +300,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -841599943
-  m_SortingLayer: 1
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: 7152930139536384079, guid: 737cef492f491a3419e7aebe68a641d5,
     type: 3}

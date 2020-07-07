@@ -11,10 +11,24 @@ using UnityEngine;
 public enum EquipmentSlots { HEAD, TORSO, LEGS, BOOTS, ARMS, WEAPON_MAIN, WEAPON_OFF };
 public class MaxAttributes : Entity
 {
-    private bool currentlyInInteractable = false;
+    public bool currentlyInInteractable = false;
 
     public float speed = 16f;
     public float gold = 5f;
+
+    public Interactable nearestInteractable
+    {
+        get
+        {
+            List<Interactable> temp = new List<Interactable>();
+            temp.AddRange(FindObjectsOfType<Interactable>());
+            temp = temp.Where(t => t.entered).ToList();
+
+            if (temp.Count > 0)
+                return temp[0];
+            else return null;
+        }
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -35,18 +49,13 @@ public class MaxAttributes : Entity
         }
         else if (Input.GetButtonDown("interact") && (currentState == EntityState.IDLE || currentState == EntityState.WALK || currentState == EntityState.INTERACTING))
         {
-            List<Interactable> temp = new List<Interactable>();
-            temp.AddRange(FindObjectsOfType<Interactable>());
-            temp = temp.Where(t => t.entered).ToList();
-
-            currentlyInInteractable = (currentState == EntityState.INTERACTING);
-
-            if (temp.Count > 0)
+            var n = nearestInteractable;
+            if (n != null)
             {
-                temp[0].Interact();
+                currentlyInInteractable = (currentState != EntityState.INTERACTING);
+                n.Interact();
                 currentState = (currentlyInInteractable) ? EntityState.IDLE : EntityState.INTERACTING;
             }
-
         }
         else if ((currentState == EntityState.WALK || currentState == EntityState.IDLE) && velocity != Vector2.zero)
         {
