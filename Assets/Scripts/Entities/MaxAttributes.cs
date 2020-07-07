@@ -53,7 +53,7 @@ public class MaxAttributes : Entity
             if (n != null)
             {
                 currentlyInInteractable = (currentState != EntityState.INTERACTING);
-                n.Interact();
+                n.Interact(gameObject);
                 currentState = (currentlyInInteractable) ? EntityState.IDLE : EntityState.INTERACTING;
             }
         }

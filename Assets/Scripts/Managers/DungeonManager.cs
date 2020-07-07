@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 
-[Serializable]
 public class DungeonManager : MonoBehaviour
 {
     public float iconSize = 1;
@@ -18,6 +17,7 @@ public class DungeonManager : MonoBehaviour
     DungeonGeneration.DungeonGeneration<GameObject> generation;
 
     private GameObject[] rooms;
+    public GameObject player;
 
     [Header("Tile Masters")]
     public GameObject northWall;
@@ -238,19 +238,11 @@ public class DungeonManager : MonoBehaviour
                 else if (chest.GetComponent<Chest>().type == ChestType.LARGE)
                     chest.GetComponent<Chest>().inventory = new InventoryItem[6];
 
+                chest.GetComponent<Chest>().player = player;
                 chest.GetComponent<Chest>().chestUI = chestUI;
-
-                //if (canvas != null)
-                //{
-                //    var obj = Instantiate(chest.GetComponent<Chest>().chestUI);
-                //    obj.SetActive(false);
-                //    obj.transform.position = Vector3.zero;
-                //    obj.transform.SetParent(canvas.transform);
-                //}
 
                 for (int i = 0; i < chest.GetComponent<Chest>().inventory.Length - 1; i++)
                 {
-                    Debug.Log("We hit");
                     //choose a random loot table to pick from
                     int tableI = UnityEngine.Random.Range(0, spawnableLoot.Length - 1);
                     LootTable table = spawnableLoot[tableI];

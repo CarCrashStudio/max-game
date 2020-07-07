@@ -7,21 +7,23 @@ public class Chest : Interactable
 {
     public ChestType type;
     public InventoryItem[] inventory;
+    public GameObject player;
 
     public GameObject chestUI;
-
-    public override void Interact()
+    public override void Interact(GameObject interacter)
     {
         if (!active)
         {
             Reload();
             active = true;
             chestUI.SetActive(true);
+            interacter.GetComponent<MaxInventory>().UI.SetActive(true);
         }
         else
         {
             active = false;
             chestUI.SetActive(false);
+            interacter.GetComponent<MaxInventory>().UI.SetActive(true);
         }
     }
 
@@ -38,22 +40,46 @@ public class Chest : Interactable
             try
             {
                 var cell = grid.transform.GetChild(i).gameObject;
-                cell.transform.GetChild(1).GetComponent<Text>().text = (inventory[i] != null) ? inventory[i].quantity.ToString() : "";
                 if (inventory[i] != null)
                 {
+
+                    cell.transform.GetChild(1).GetComponent<Text>().text = inventory[i].quantity.ToString();
                     cell.transform.GetChild(0).GetComponent<Image>().sprite = inventory[i].item.GetComponent<SpriteRenderer>().sprite;
+                    var ii = inventory[i];
+                    cell.transform.GetChild(0).GetComponent<Button>().onClick.RemoveAllListeners();
+                    cell.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => { Loot(ii); });
+                    cell.transform.GetChild(1).gameObject.SetActive(true);
                     cell.transform.GetChild(0).gameObject.SetActive(true);
                 }
                 else
                 {
+                    cell.transform.GetChild(1).gameObject.SetActive(false);
                     cell.transform.GetChild(0).gameObject.SetActive(false);
                 }
             }
             catch (System.Exception)
             {
 
-                throw;
             }
+        }
+
+    }
+
+    public void Loot (InventoryItem ii)
+    {
+        if (player.GetComponent<MaxAttributes>().currentlyInInteractable)
+        {
+            player.GetComponent<MaxInventory>().PickUp(ii);
+            for (int i = 0; i < inventory.Length -1; i++)
+            {
+                if (inventory[i] == ii)
+                {
+                    inventory[i] = null;
+                    break;
+                }
+            }
+            Reload();
+            player.GetComponent<MaxInventory>().ReloadUI();
         }
     }
 
