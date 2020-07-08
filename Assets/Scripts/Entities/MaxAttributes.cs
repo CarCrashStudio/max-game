@@ -11,6 +11,7 @@ using UnityEngine;
 public enum EquipmentSlots { HEAD, TORSO, LEGS, BOOTS, ARMS, WEAPON_MAIN, WEAPON_OFF };
 public class MaxAttributes : Entity
 {
+    public DungeonManager manager;
     public bool currentlyInInteractable = false;
 
     public float speed = 16f;
@@ -54,7 +55,7 @@ public class MaxAttributes : Entity
             {
                 currentlyInInteractable = (currentState != EntityState.INTERACTING);
                 n.Interact(gameObject);
-                currentState = (currentlyInInteractable) ? EntityState.IDLE : EntityState.INTERACTING;
+                currentState = (!currentlyInInteractable) ? EntityState.IDLE : EntityState.INTERACTING;
             }
         }
         else if ((currentState == EntityState.WALK || currentState == EntityState.IDLE) && velocity != Vector2.zero)

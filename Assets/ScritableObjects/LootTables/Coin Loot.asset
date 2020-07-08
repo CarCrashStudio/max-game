@@ -19,13 +19,13 @@ MonoBehaviour:
     lootChance: 0.085
   - item:
       item: {fileID: 435936278757911216, guid: 1ce38d89fdd1b7840b3def59b58acbe1, type: 3}
-      quantity: 3
+      quantity: 4
     lootChance: 0.667
   - item:
       item: {fileID: 435936278757911216, guid: 1ce38d89fdd1b7840b3def59b58acbe1, type: 3}
-      quantity: 2
+      quantity: 3
     lootChance: 0.856
   - item:
-      item: {fileID: 435936278757911216, guid: 1ce38d89fdd1b7840b3def59b58acbe1, type: 3}
-      quantity: 1
+      item: {fileID: 0}
+      quantity: 0
     lootChance: 0.969

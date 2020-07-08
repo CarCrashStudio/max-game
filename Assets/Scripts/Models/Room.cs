@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Room : MonoBehaviour
 {
+    public DungeonGeneration.Room<GameObject> roomDets;
     public GameObject enemyInRoom;
     public float maxEnemiesInRoom;
     public Vector2 roomSize;

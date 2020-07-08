@@ -10,4 +10,15 @@ public class InventoryItem
 {
     public Item item;
     public int quantity;
+
+    public InventoryItem ()
+    {
+
+    }
+
+    public InventoryItem (Item i, int q)
+    {
+        item = i;
+        quantity = q;
+    }
 }

@@ -8,8 +8,8 @@ public class SceneChange : MonoBehaviour
     public bool changeScene;
     public bool changeRoom;
 
-    public GameObject targetRoom;
-    public GameObject roomManager;
+    public int targetRoom;
+    public RoomManager roomManager;
     public Camera cam;
 
     public Vector2 cameraChange;
@@ -20,8 +20,6 @@ public class SceneChange : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             inRange = true;
-            Debug.Log(inRange);
-
             if (changeRoom)
                 ChangeRoom(other);
 
@@ -34,7 +32,6 @@ public class SceneChange : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             inRange = false;
-            Debug.Log(inRange);
         }
     }
 
@@ -46,7 +43,7 @@ public class SceneChange : MonoBehaviour
 
         other.transform.position += playerChange;
 
-        roomManager.GetComponent<RoomManager>().ChangeRoom(targetRoom);
+        roomManager.ChangeRoom(roomManager.rooms[targetRoom]);
     }
 
     void ChangeScene ()

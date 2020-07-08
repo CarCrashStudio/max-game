@@ -5,21 +5,19 @@ using System.Linq;
 using System;
 
 [Serializable]
-public class RoomManager : MonoBehaviour
+public class RoomManager
 {
-    public GameObject startingRoom;
+    public GameObject currentRoom;
+    public GameObject[] rooms;
 
     // Start is called before the first frame update
-    void Start()
+    public void Start()
     {
-        startingRoom.SetActive(true);
-        List<GameObject> otherRooms = FindObjectsOfType<GameObject>().Where(r => r.tag == "room").ToList();
-
-        otherRooms.ForEach(r =>
-        {
-            if (r != startingRoom)
-                r.SetActive(false);
-        });
+        currentRoom.SetActive(true);
+        //rooms = UnityEngine.Object.FindObjectsOfType<GameObject>().Where(r => r.tag == "room").ToArray();
+        //foreach (var r in rooms)
+            //if (r != currentRoom)
+                //r.SetActive(false);
     }
 
     // Update is called once per frame
@@ -30,12 +28,11 @@ public class RoomManager : MonoBehaviour
 
     public void ChangeRoom (GameObject room)
     {
-        Debug.Log("Hit");
-        startingRoom.SetActive(false);
+        currentRoom.SetActive(false);
 
-        startingRoom = room;
+        currentRoom = room;
 
-        startingRoom.SetActive(true);
+        currentRoom.SetActive(true);
 
     }
 }

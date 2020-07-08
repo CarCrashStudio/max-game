@@ -12,7 +12,7 @@ public class DungeonManager : MonoBehaviour
     public int dungeonSeed = 0;
     public Camera mainCamera;
 
-    private RoomManager roomManager = new RoomManager();
+    public RoomManager roomManager;
 
     DungeonGeneration.DungeonGeneration<GameObject> generation;
 
@@ -54,6 +54,12 @@ public class DungeonManager : MonoBehaviour
 
     [Header("Editor Properties")]
     public bool autoUpdate = false;
+
+    private void Start()
+    {
+        roomManager.Start();
+    }
+
     public void GenerateRandomSeed ()
     {
         var seedLength = UnityEngine.Random.Range(0, 10);
@@ -65,6 +71,8 @@ public class DungeonManager : MonoBehaviour
     }
     public void GenerateMap ()
     {
+        roomManager = new RoomManager();
+        player.GetComponent<MaxAttributes>().manager = this;
         try
         {
             if (roomWidth.x > roomWidth.y)
@@ -95,8 +103,8 @@ public class DungeonManager : MonoBehaviour
 
     public void SetCameraPos ()
     {
-        var pos = rooms[0].GetComponent<Room>().roomPos;
-        var size = rooms[0].GetComponent<Room>().roomSize;
+        var pos = roomManager.currentRoom.GetComponent<Room>().roomPos;
+        var size = roomManager.currentRoom.GetComponent<Room>().roomSize;
 
         float height = Mathf.Round(2f * mainCamera.orthographicSize / mainCamera.rect.height);
         float width = Mathf.Round(height * mainCamera.aspect / mainCamera.rect.width);
@@ -129,6 +137,8 @@ public class DungeonManager : MonoBehaviour
 
             roomT.GetComponent<Room>().roomPos = new UnityEngine.Vector2(room.Origin.X, -room.Origin.Y);
             roomT.GetComponent<Room>().roomSize = new UnityEngine.Vector2(room.Width, room.Height);
+            room.Root = roomT;
+            roomT.GetComponent<Room>().roomDets = room;
 
             roomT.tag = "room";
             roomT.transform.position = new UnityEngine.Vector2(roomT.GetComponent<Room>().roomPos.x, -roomT.GetComponent<Room>().roomPos.y);
@@ -159,56 +169,68 @@ public class DungeonManager : MonoBehaviour
                 }
             }
 
-            room.Root = roomT;
+            
             this.rooms[i] = roomT;
             i++;
         }
-        foreach (var room in rooms)
-        {
-            FindDoors(room);
-            FindChests(room);
-        }
+        roomManager.currentRoom = this.rooms[0];
+        roomManager.rooms = this.rooms;
 
-        roomManager.startingRoom = this.rooms[0];
+        foreach (var room in this.rooms)
+        {
+            FindDoors(room.GetComponent<Room>());
+            FindChests(room.GetComponent<Room>());
+        }
     }
 
-    public void FindDoors(Room<GameObject> room)
+    int FindRoom (Room room)
+    {
+        for(int i = 0; i < roomManager.rooms.Length; i++)
+        {
+            var r = roomManager.rooms[i].GetComponent<Room>();
+            if (r.roomDets.ID == room.roomDets.ID)
+                return i;
+        }
+        return -1;
+    }
+    public void FindDoors(Room room)
     {
         try
         {
             // get a list of all door objects
-            var doors = room.WorldObjects.Where(t => t == northDoor || t == southDoor || t == eastDoor || t == westDoor).ToList();
+            var doors = room.roomDets.WorldObjects.Where(t => t == northDoor || t == southDoor || t == eastDoor || t == westDoor).ToList();
 
             // set tart clamps, target rooms, and other info
             foreach (var door in doors)
             {
-                door.GetComponent<SceneChange>().roomManager = gameObject;
+                door.GetComponent<SceneChange>().roomManager = roomManager;
                 door.GetComponent<SceneChange>().cam = mainCamera;
 
                 // target rooms depends on which door type this is
                 if (door == northDoor)
                 {
-                    door.GetComponent<SceneChange>().targetRoom = room.ToNorth.Root;
+
+                    door.GetComponent<SceneChange>().targetRoom = FindRoom(room.roomDets.ToNorth.Root.GetComponent<Room>());
                     door.GetComponent<SceneChange>().playerChange = new UnityEngine.Vector2(0, 5);
-                    door.GetComponent<SceneChange>().cameraChange = new UnityEngine.Vector2(0, room.ToNorth.Height);
+                    door.GetComponent<SceneChange>().cameraChange = new UnityEngine.Vector2(0, room.roomDets.ToNorth.Height);
                 }
                 else if (door == southDoor)
                 {
-                    door.GetComponent<SceneChange>().targetRoom = room.ToSouth.Root;
+                    door.GetComponent<SceneChange>().targetRoom = FindRoom(room.roomDets.ToSouth.Root.GetComponent<Room>());
                     door.GetComponent<SceneChange>().playerChange = new UnityEngine.Vector2(0, -5);
-                    door.GetComponent<SceneChange>().cameraChange = new UnityEngine.Vector2(0, -room.ToSouth.Height);
+                    door.GetComponent<SceneChange>().cameraChange = new UnityEngine.Vector2(0, -room.roomDets.ToSouth.Height);
                 }
                 else if (door == eastDoor)
                 {
-                    door.GetComponent<SceneChange>().targetRoom = room.ToEast.Root;
+                    door.GetComponent<SceneChange>().targetRoom = FindRoom(room.roomDets.ToEast.Root.GetComponent<Room>());
                     door.GetComponent<SceneChange>().playerChange = new UnityEngine.Vector2(5, 0);
-                    door.GetComponent<SceneChange>().cameraChange = new UnityEngine.Vector2(room.ToEast.Width, 0);
+                    door.GetComponent<SceneChange>().cameraChange = new UnityEngine.Vector2(room.roomDets.ToEast.Width, 0);
                 }
                 else if (door == westDoor)
                 {
-                    door.GetComponent<SceneChange>().targetRoom = room.ToWest.Root;
+                    door.GetComponent<SceneChange>().targetRoom = FindRoom(room.roomDets.ToWest.Root.GetComponent<Room>());
                     door.GetComponent<SceneChange>().playerChange = new UnityEngine.Vector2(-5, 0);
-                    door.GetComponent<SceneChange>().cameraChange = new UnityEngine.Vector2(-room.ToEast.Width, 0);
+                    door.GetComponent<SceneChange>().cameraChange = new UnityEngine.Vector2(-room.roomDets.ToWest.Width, 0);
                 }
             }
         }
@@ -217,17 +239,12 @@ public class DungeonManager : MonoBehaviour
             Debug.LogError($"{ex.Message}\n{ex.StackTrace}");
         }
     }
-    public void FindChests(Room<GameObject> room)
+    public void FindChests(Room room)
     {
         try
         {
             // get a list of all door objects
-            var chests = room.WorldObjects.Where(t => t == smallChest).ToList();
-
-            // check if the canvas object has already been created and find it
-            var canvas = GameObject.FindObjectOfType<Canvas>();
-            Debug.Log(canvas);
-
+            var chests = room.roomDets.WorldObjects.Where(t => t == smallChest).ToList();
 
             // set tart clamps, target rooms, and other info
             foreach (var chest in chests)
