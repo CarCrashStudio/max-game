@@ -17,15 +17,15 @@ public class Chest : Interactable
             Reload();
             active = true;
             chestUI.SetActive(true);
-            interacter.GetComponent<MaxInventory>().inventoryUI.SetActive(true);
-            interacter.GetComponent<MaxInventory>().invOpen = true;
+            interacter.GetComponent<PlayerInventory>().inventoryUI.SetActive(true);
+            interacter.GetComponent<PlayerInventory>().invOpen = true;
         }
         else
         {
             active = false;
             chestUI.SetActive(false);
-            interacter.GetComponent<MaxInventory>().inventoryUI.SetActive(false);
-            interacter.GetComponent<MaxInventory>().invOpen = false;
+            interacter.GetComponent<PlayerInventory>().inventoryUI.SetActive(false);
+            interacter.GetComponent<PlayerInventory>().invOpen = false;
         }
     }
 
@@ -69,9 +69,9 @@ public class Chest : Interactable
 
     public void Loot (InventoryItem ii)
     {
-        if (player.GetComponent<MaxAttributes>().currentlyInInteractable)
+        if (player.GetComponent<PlayerMovement>().currentlyInInteractable)
         {
-            player.GetComponent<MaxInventory>().PickUp(ii);
+            player.GetComponent<PlayerInventory>().PickUp(ii);
             for (int i = 0; i < inventory.Length -1; i++)
             {
                 if (inventory[i] == ii)
@@ -81,7 +81,7 @@ public class Chest : Interactable
                 }
             }
             Reload();
-            player.GetComponent<MaxInventory>().ReloadInventoryUI();
+            player.GetComponent<PlayerInventory>().ReloadInventoryUI();
         }
     }
 

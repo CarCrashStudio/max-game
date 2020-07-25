@@ -1,63 +1,46 @@
-﻿using System.Collections;
+﻿// Attribute Script
+// Author: Trey Hall
+// Description:
+// Handles getting and modifying attributes related to the player such as health, mana, and other rpg attributes.
+
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MaxInventory : MonoBehaviour
+public enum EntityState { WALK, ATTACK, STAGGER, IDLE, INTERACTING }
+public class Player : MonoBehaviour
 {
+    [SerializeField] protected byte level = 1;
+    public EntityState currentState;
+    public DungeonManager manager;
+    public bool currentlyInInteractable = false;
 
-    //C58A6D
-    //C0C56D
-    Color NORMAL_CELL_COLOR = new Color(197, 138, 109, 255);
-    Color SELECTED_CELL_COLOR = new Color(192, 197, 109, 255);
+    public float speed = 16f;
+    public float gold = 5f;
+
+    public Health health;
+    public Signal healthSignal;
+    public Attributes attributes;
+
+    [SerializeField] protected Rigidbody2D myRigidBody => gameObject.GetComponent<Rigidbody2D>();
+    [SerializeField] protected Animator animator => gameObject.GetComponent<Animator>();
+
+    #region INVENTORY
     public bool invOpen = false;
-    public bool charOpen = false;
-    private MaxAttributes attributes { get { return GetComponent<MaxAttributes>(); } }
-
     public int inventorySize = 12;
     public GameObject inventoryUI;
-    public GameObject characterUI;
 
     private InventoryItem[] inventory;
-    public Equipment[] equipment;
-
     private InventoryItem selectedItem = null;
-    private Equipment selectedEquipment = null;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        inventory = new InventoryItem[inventorySize];
-        equipment = new Equipment[6];
-        ReloadInventoryUI();
-        ReloadCharacterEquUI();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetButtonDown("inventory"))
-        {
-            inventoryUI.SetActive(!invOpen);
-            invOpen = !invOpen;
-        }
-        if (Input.GetButtonDown("character"))
-        {
-            characterUI.SetActive(!charOpen);
-            charOpen = !charOpen;
-        }
-
-        attributes.currentlyInInteractable = (charOpen || invOpen);
-        attributes.currentState = (attributes.currentlyInInteractable) ? EntityState.INTERACTING : EntityState.IDLE;
-    }
 
     public void SelectItem(InventoryItem ii)
     {
         selectedItem = ii;
         ReloadInventoryUI();
     }
-    public void PickUp (InventoryItem ii)
+    public void PickUp(InventoryItem ii)
     {
         if (ii.item == null)
             throw new System.Exception("PickUp cannot use a null Item");
@@ -94,7 +77,7 @@ public class MaxInventory : MonoBehaviour
             inventory[newI] = ii;
         }
     }
-    public void Drop (InventoryItem ii)
+    public void Drop(InventoryItem ii)
     {
         if (ii.item == null)
             throw new System.Exception("Drop cannot use a null Item");
@@ -164,11 +147,11 @@ public class MaxInventory : MonoBehaviour
     }
     private void EquipItemButton()
     {
-        Equip((Equipment)selectedItem.item);
+        GetComponent<PlayerEquipment>().Equip((Equipment)selectedItem.item);
         Drop(new InventoryItem(selectedItem.item, 1));
         selectedItem = null;
         ReloadInventoryUI();
-        ReloadCharacterEquUI();
+        GetComponent<PlayerEquipment>().ReloadCharacterEquUI();
     }
     private void DropItemButton()
     {
@@ -182,7 +165,12 @@ public class MaxInventory : MonoBehaviour
         selectedItem = null;
 
     }
-
+    #endregion
+    #region EQUIPMENT
+    public bool charOpen = false;
+    public Equipment[] equipment;
+    private Equipment selectedEquipment = null;
+    public GameObject characterUI;
 
     public void SelectEquipment(Equipment e)
     {
@@ -193,11 +181,11 @@ public class MaxInventory : MonoBehaviour
     {
         //switch (e.type)
         //{
-            //case EquipmentType.ARMOR:
+        //case EquipmentType.ARMOR:
         //var slot = characterUI.transform.GetChild(1).GetChild((int)e.slot);
         //slot.GetChild(0).GetComponent<Image>().sprite = e.GetComponent<SpriteRenderer>().sprite;
         equipment[(int)e.slot] = e;
-                //break;
+        //break;
         //}
     }
     public void Unequip(Equipment e)
@@ -255,4 +243,88 @@ public class MaxInventory : MonoBehaviour
         ReloadCharacterEquUI();
         ReloadInventoryUI();
     }
+    #endregion
+
+    private Interactable nearestInteractable
+    {
+        get
+        {
+            List<Interactable> temp = new List<Interactable>();
+            temp.AddRange(FindObjectsOfType<Interactable>());
+            temp = temp.Where(t => t.entered).ToList();
+
+            if (temp.Count > 0)
+                return temp[0];
+            else return null;
+        }
+    }
+
+    public void Start()
+    {
+        attributes.Start();
+    }
+    public void Update()
+    {
+        #region MOVEMENT
+        Vector2 velocity = Vector2.zero;
+        velocity.x = Input.GetAxisRaw("Horizontal");
+        velocity.y = Input.GetAxisRaw("Vertical");
+
+        if ((currentState == EntityState.WALK || currentState == EntityState.IDLE) && velocity != Vector2.zero)
+        {
+            myRigidBody.position += velocity * speed * Time.deltaTime;
+
+            animator.SetFloat("Horizontal", velocity.x);
+            animator.SetFloat("Vertical", velocity.y);
+            animator.SetBool("moving", true);
+        }
+        else
+        {
+            animator.SetBool("moving", false);
+        }
+        #endregion
+
+        #region INVENTORY
+        if (Input.GetButtonDown("inventory"))
+        {
+            if (!invOpen)
+                ReloadInventoryUI();
+
+            inventoryUI.SetActive(!invOpen);
+            invOpen = !invOpen;
+        }
+        currentlyInInteractable = invOpen;
+        currentState = (currentlyInInteractable) ? EntityState.INTERACTING : EntityState.IDLE;
+        #endregion
+        #region EQUIPMENT
+        if (Input.GetButtonDown("character"))
+        {
+            characterUI.SetActive(!charOpen);
+            charOpen = !charOpen;
+        }
+
+        currentlyInInteractable = charOpen;
+        currentState = (currentlyInInteractable) ? EntityState.INTERACTING : EntityState.IDLE;
+        #endregion
+
+        #region INTERACTION
+        if (Input.GetButtonDown("interact") && (currentState == EntityState.IDLE || currentState == EntityState.WALK || currentState == EntityState.INTERACTING))
+        {
+            var n = nearestInteractable;
+            if (n != null)
+            {
+                currentlyInInteractable = (currentState != EntityState.INTERACTING);
+                n.Interact(gameObject);
+                currentState = (!currentlyInInteractable) ? EntityState.IDLE : EntityState.INTERACTING;
+            }
+        } 
+        #endregion
+        attributes.Update();
+    }
+
+    public override string ToString()
+    {
+        return base.ToString();
+    }
 }
+

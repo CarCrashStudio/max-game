@@ -12,10 +12,10 @@ public class CombatManger : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        for(int i = 0; i < enemies.Length; i++)
+        for (int i = 0; i < enemies.Length; i++)
             enemyPlatforms[i].transform.GetChild(1).GetComponent<Image>().sprite = enemies[i].GetComponent<SpriteRenderer>().sprite;
-    }
 
+    }
     // Update is called once per frame
     void Update()
     {

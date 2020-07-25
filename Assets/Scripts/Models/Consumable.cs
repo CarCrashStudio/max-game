@@ -7,24 +7,21 @@ public enum ConsumableType { BUFF, HEALTH, CURRENCY }
 [Serializable]
 public class Consumable : Item
 {
-    public Signal healthSignal;
     public ConsumableType type;
     public float amount;
 
     public override void Use(Entity target)
     {
-        switch (type)
-        {
-            case ConsumableType.HEALTH:
-                target.currentHealth.initialValue += amount;
-                if (healthSignal != null)
-                    healthSignal.Raise();
-                break;
-            case ConsumableType.CURRENCY:
-                ((MaxAttributes)target).gold += amount;
-                if (healthSignal != null)
-                    healthSignal.Raise();
-                break;
-        }
+        //switch (type)
+        //{
+        //    case ConsumableType.HEALTH:
+        //        target.health.Heal(amount);
+        //        //if (target.healthSignal != null)
+        //            //target.healthSignal.Raise();
+        //        break;
+        //    case ConsumableType.CURRENCY:
+        //        ((PlayerMovement)target).gold += amount;
+        //        break;
+        //}
     }
 }

@@ -72,7 +72,7 @@ public class DungeonManager : MonoBehaviour
     public void GenerateMap ()
     {
         roomManager = new RoomManager();
-        player.GetComponent<MaxAttributes>().manager = this;
+        player.GetComponent<PlayerMovement>().manager = this;
         try
         {
             if (roomWidth.x > roomWidth.y)

@@ -25,22 +25,25 @@ public class Enemy : Entity
     private bool isHome { get { return rb.position == home; } }
 
     // Start is called before the first frame update
-    void Start()
+    public override void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
         rb = GetComponent<Rigidbody2D>();
         playerRb = player.GetComponent<Rigidbody2D>();
 
         home = rb.position;
+
+        base.Start();
     }
 
     // Update is called once per frame
-    void Update()
+    public override void Update()
     {
         float d = Vector2.Distance(rb.position, playerRb.position);
         if (d <= awakeRadius && d > moveRadius)
+        {
             animator.SetBool("sleeping", false);
-
+        }
         else if (d <= moveRadius && d >= attackRadius)
         {
             Vector2 distance = new Vector2(d - attackRadius, d - attackRadius);
@@ -48,12 +51,6 @@ public class Enemy : Entity
                 animator.SetBool("moving", true);
             returnHome = true;
             rb.position = Vector2.MoveTowards(rb.position, playerRb.position, speed * Time.deltaTime); ;
-        }
-        else if (d <= attackRadius)
-        {
-            Debug.Log("Attacking");
-            animator.SetBool("moving", false);
-            StartCoroutine(AttackCo());
         }
         else
         {
@@ -73,8 +70,10 @@ public class Enemy : Entity
             }
             else
                 if (!animator.GetBool("sleeping"))
-                    animator.SetBool("sleeping", true);
+                animator.SetBool("sleeping", true);
 
         }
+
+        base.Update();
     }
 }
