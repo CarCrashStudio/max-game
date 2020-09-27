@@ -12,12 +12,13 @@ public class DungeonManager : MonoBehaviour
     public int dungeonSeed = 0;
     public Camera mainCamera;
 
+    [HideInInspector]
     public RoomManager roomManager;
 
     DungeonGeneration.DungeonGeneration<GameObject> generation;
 
     private GameObject[] rooms;
-    public GameObject player;
+    private Player player;
 
     [Header("Tile Masters")]
     public GameObject northWall;
@@ -58,6 +59,8 @@ public class DungeonManager : MonoBehaviour
     private void Start()
     {
         roomManager.Start();
+        if (player == null) { player = FindObjectOfType<Player>(); }
+        
     }
 
     public void GenerateRandomSeed ()
@@ -72,7 +75,8 @@ public class DungeonManager : MonoBehaviour
     public void GenerateMap ()
     {
         roomManager = new RoomManager();
-        player.GetComponent<PlayerMovement>().manager = this;
+        if (player == null) { player = FindObjectOfType<Player>(); }
+        player.manager = this;
         try
         {
             if (roomWidth.x > roomWidth.y)
@@ -86,18 +90,17 @@ public class DungeonManager : MonoBehaviour
 
             generation = new DungeonGeneration<GameObject>(northWall, southWall, eastWall, westWall, northwestCorner, northeastCorner, southwestCorner, southeastCorner, northDoor, southDoor, eastDoor, westDoor, floor, smallChest, dungeonSeed);
 
-            Room<GameObject> room = generation.BuildDungeon(new DungeonGeneration.Vector2(0, 0), 
+            List<Room<GameObject>> rooms = generation.BuildDungeon(new DungeonGeneration.Vector2(0, 0), 
                                                             new DungeonGeneration.Vector2(roomWidth.x, roomWidth.y), 
                                                             new DungeonGeneration.Vector2(roomHeight.x, roomHeight.y), 
                                                             new DungeonGeneration.Vector2(roomCount.x, roomCount.y), 
                                                             new DungeonGeneration.Vector2(chestCount.x, chestCount.y));
-            List<Room<GameObject>> rooms = new List<Room<GameObject>>();
             rooms = rooms.OrderBy(r => r.ID).ToList();
-            room.GetRooms(ref rooms);
             BuildAllRooms(rooms);
         }
         catch (System.Exception ex)
         {
+            Debug.LogError($"{ex.Message}{ex.StackTrace}");
         }
     }
 
@@ -149,7 +152,7 @@ public class DungeonManager : MonoBehaviour
                 for (int x = room.Origin.X; x < room.Width + room.Origin.X; x++)
                 {
                     var index = (x - room.Origin.X) + (y - room.Origin.Y) * room.Width;
-                    GameObject tile = Instantiate(room.Tiles[index], roomT.transform);
+                    GameObject tile = Instantiate(room.Tiles[index].Root, roomT.transform);
 
                     tile.transform.position = new UnityEngine.Vector2((x * iconSize) + (iconSize / 2), -(y * iconSize) - (iconSize / 2));
                 }
@@ -160,9 +163,9 @@ public class DungeonManager : MonoBehaviour
                 for (int x = room.Origin.X; x < room.Width + room.Origin.X; x++)
                 {
                     var index = (x - room.Origin.X) + (y - room.Origin.Y) * room.Width;
-                    if (room.WorldObjects[index] != null)
+                    if (room.WorldObjects[index] != null && room.WorldObjects[index].Root != null)
                     {
-                        GameObject tile = Instantiate(room.WorldObjects[index], roomT.transform);
+                        GameObject tile = Instantiate(room.WorldObjects[index].Root, roomT.transform);
                         tile.transform.position = new UnityEngine.Vector2((x * iconSize) + (iconSize / 2), -(y * iconSize) - (iconSize / 2));
                     }
 
@@ -198,7 +201,7 @@ public class DungeonManager : MonoBehaviour
         try
         {
             // get a list of all door objects
-            var doors = room.roomDets.WorldObjects.Where(t => t == northDoor || t == southDoor || t == eastDoor || t == westDoor).ToList();
+            var doors = room.roomDets.WorldObjects.Where(t => t.Root == northDoor || t.Root == southDoor || t.Root == eastDoor || t.Root == westDoor).Select(t => t.Root).ToList();
 
             // set tart clamps, target rooms, and other info
             foreach (var door in doors)
@@ -244,7 +247,7 @@ public class DungeonManager : MonoBehaviour
         try
         {
             // get a list of all door objects
-            var chests = room.roomDets.WorldObjects.Where(t => t == smallChest).ToList();
+            var chests = room.roomDets.WorldObjects.Where(t => t.Root == smallChest).Select(t => t.Root).ToList();
 
             // set tart clamps, target rooms, and other info
             foreach (var chest in chests)
@@ -286,5 +289,20 @@ public class DungeonManager : MonoBehaviour
         for (int j = 10; j >= 0; j--)
             for(int i = 0; i < transform.childCount; i++)
                 DestroyImmediate(transform.GetChild(i).gameObject);
+    }
+
+    public void Save ()
+    {
+        generation.SaveDungeon(Application.persistentDataPath + "/saves/savefile1");
+    }
+    public void Load()
+    {
+        roomManager = new RoomManager();
+        if (player == null) { player = FindObjectOfType<Player>(); }
+        player.manager = this;
+
+        generation = new DungeonGeneration<GameObject>(northWall, southWall, eastWall, westWall, northwestCorner, northeastCorner, southwestCorner, southeastCorner, northDoor, southDoor, eastDoor, westDoor, floor, smallChest, dungeonSeed);
+        List<Room<GameObject>> rooms = generation.LoadDungeon(Application.persistentDataPath + "/saves/savefile1");
+        BuildAllRooms(rooms);
     }
 }

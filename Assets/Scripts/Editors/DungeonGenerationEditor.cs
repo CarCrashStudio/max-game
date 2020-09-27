@@ -34,6 +34,14 @@ public class DungeonGenerationEditor : Editor
         {
             dungeonGen.DestroyMap();
         }
+        if (GUILayout.Button("Save"))
+        {
+            dungeonGen.Save();
+        }
+        if (GUILayout.Button("Load"))
+        {
+            dungeonGen.Load();
+        }
         if (GUILayout.Button("Set Camera Pos"))
         {
             dungeonGen.SetCameraPos();

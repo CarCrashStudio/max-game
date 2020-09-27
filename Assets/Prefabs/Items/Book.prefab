@@ -100,3 +100,11 @@ MonoBehaviour:
   cost: 0
   type: 1
   slot: 5
+  modifier:
+    strength_modifier: 0
+    dexterity_modifier: 0
+    constitution_modifier: 0
+    intelligence_modifier: 2
+    wisdom_modifier: 0
+    charisma_modifier: 0
+  attackType: 1

@@ -5,11 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class Health : MonoBehaviour
+[CreateAssetMenu]
+public class Health : ScriptableObject
 {
     [SerializeField] protected float maxHealth;
     [SerializeField] protected float currentHealth;
 
+    public string GetHealth ()
+    {
+        return string.Concat(currentHealth.ToString(), "/", maxHealth.ToString());
+    }
     /// <summary>
     /// 
     /// </summary>

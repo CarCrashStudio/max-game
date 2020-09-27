@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System;
+using UnityEditor;
 using UnityEngine;
 
 [System.Serializable]
@@ -11,37 +12,32 @@ public class Attributes
     [SerializeField] protected int wisdom;
     [SerializeField] protected int charisma;
 
-    [SerializeField] private int strengthModifier = 0;
-    [SerializeField] private int dexterityModifier = 0;
-    [SerializeField] private int constitutionModifier = 0;
-    [SerializeField] private int intelligenceModifier = 0;
-    [SerializeField] private int wisdomModifier = 0;
-    [SerializeField] private int charismaModifier = 0;
-
-    public int StrengthModifier { get { return strengthModifier; } }
-    public int DexterityModifier { get { return dexterityModifier; } }
-    public int ConstitutionModifier { get { return constitutionModifier; } }
-    public int IntelligenceModifier { get { return intelligenceModifier; } }
-    public int WisdomModifier { get { return wisdomModifier; } }
-    public int CharismaModifier { get { return charismaModifier; } }
+    public Modifier mainModifiers;
+    public Modifier equipmentModifiers;
+    public Modifier buffModifiers;
+    public Modifier totalModifiers;
 
     public void Start()
     {
-        strengthModifier = (strength - 10) / 2;
-        dexterityModifier = (dexterity - 10) / 2;
-        constitutionModifier = (constitution - 10) / 2;
-        intelligenceModifier = (intelligence - 10) / 2;
-        wisdomModifier = (wisdom - 10) / 2;
-        charismaModifier = (charisma - 10) / 2;
+        int strengthModifier = (strength - 10) / 2;
+        int dexterityModifier = (dexterity - 10) / 2;
+        int constitutionModifier = (constitution - 10) / 2;
+        int intelligenceModifier = (intelligence - 10) / 2;
+        int wisdomModifier = (wisdom - 10) / 2;
+        int charismaModifier = (charisma - 10) / 2;
+
+        mainModifiers = new Modifier(strengthModifier, dexterityModifier, constitutionModifier, intelligenceModifier, wisdomModifier, charismaModifier);
     }
     public void Update()
     {
-        strengthModifier = (strength - 10) / 2;
-        dexterityModifier = (dexterity - 10) / 2;
-        constitutionModifier = (constitution - 10) / 2;
-        intelligenceModifier = (intelligence - 10) / 2;
-        wisdomModifier = (wisdom - 10) / 2;
-        charismaModifier = (charisma - 10) / 2;
+        mainModifiers.SetStrength((strength - 10) / 2);
+        mainModifiers.SetDexterity((dexterity - 10) / 2);
+        mainModifiers.SetConstitution((constitution - 10) / 2);
+        mainModifiers.SetIntelligence((intelligence - 10) / 2);
+        mainModifiers.SetWisdom((wisdom - 10) / 2);
+        mainModifiers.SetCharisma((charisma - 10) / 2);
+
+        totalModifiers = mainModifiers + equipmentModifiers + buffModifiers;
     }
 
     public void IncreaseStrength (int amt)
@@ -105,24 +101,16 @@ public class Attributes
         if (charisma < 1)
             charisma = 1;
     }
+
+    public override string ToString()
+    {
+        string r = "--- Attributes ---\n";
+        r += $"Strength: {strength}({totalModifiers.Strength})\n";
+        r += $"Dexterity: {dexterity}({totalModifiers.Dexterity})\n";
+        r += $"Constitution: {constitution}({totalModifiers.Constitution})\n";
+        r += $"Intelligence: {intelligence}({totalModifiers.Intelligence})\n";
+        r += $"Wisdom: {wisdom}({totalModifiers.Wisdom})\n";
+        r += $"Charisma: {strength}({totalModifiers.Charisma})\n";
+        return r;
+    }
 }
-
-//[CustomEditor(typeof(Attributes))]
-//public class AttributesEditor : Editor
-//{
-//    public override void OnInspectorGUI()
-//    {
-//        Attributes attributes = (Attributes)target;
-//        DrawDefaultInspector();
-
-//        if (GUILayout.Button("Roll Stats"))
-//        {
-//            attributes.IncreaseStrength(Random.Range(0, 20));
-//            attributes.IncreaseDexterity(Random.Range(0, 20));
-//            attributes.IncreaseConstitution(Random.Range(0, 20));
-//            attributes.IncreaseIntelligence(Random.Range(0, 20));
-//            attributes.IncreaseWisdom(Random.Range(0, 20));
-//            attributes.IncreaseCharisma(Random.Range(0, 20));
-//        }
-//    }
-//}

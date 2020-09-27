@@ -11,17 +11,23 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
+
 namespace DungeonGeneration
 {
     /// <summary>
     /// Vector2 is a class containing an x and y value pair
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public struct Vector2
     {
-        private int x, y;
+        [JsonProperty]
+        private int x;
+
+        [JsonProperty]
+        private int y;
         public Vector2(int x, int y)
         {
             this.x = x;
@@ -36,30 +42,130 @@ namespace DungeonGeneration
         public int X { get { return x; } set { x = value; } }
         public int Y { get { return y; } set { y = value; } }
     }
+
+    [JsonObject(MemberSerialization.OptIn)]
+    public partial class Tile <T>
+    {
+        private T _root;
+
+        [JsonProperty]
+        private int _id;
+        [JsonProperty]
+        private Vector2 _worldPoint;
+
+        public int Id { get => _id; set => _id = value; }
+        public Vector2 WorldPoint { get => _worldPoint; set => _worldPoint = value; }
+        public T Root { get => _root; set => _root = value; }
+    }
+    [JsonObject(MemberSerialization.OptIn)]
     public partial class Room<T>
     {
         public T Root { get; set; }
 
+        [JsonProperty]
         byte roomCount = 0;
-
+        [JsonProperty]
         int id = 0;
+
+        int north_id = -1;
+        int south_id = -1;
+        int east_id = -1;
+        int west_id = -1;
+
+        [JsonProperty]
+        public int to_north_id
+        {
+            get
+            {
+                if (north_id == -1)
+                {
+                    north_id = (to_north != null ? to_north.ID : -1);
+                }
+                return north_id;
+            }
+            set
+            {
+                north_id = value;
+            }
+        }
+        [JsonProperty]
+        public int to_south_id
+        {
+            get
+            {
+                if (south_id == -1)
+                {
+                    south_id = (to_south != null ? to_south.ID : -1);
+                }
+                return south_id;
+            }
+            set
+            {
+                south_id = value;
+            }
+        }
+        [JsonProperty]
+        public int to_east_id
+        {
+            get
+            {
+                if (east_id == -1)
+                {
+                    east_id = (to_east != null ? to_east.ID : -1);
+                }
+                return east_id;
+            }
+            set
+            {
+                east_id = value;
+            }
+        }
+        [JsonProperty]
+        public int to_west_id
+        {
+            get
+            {
+                if (west_id == -1)
+                {
+                    west_id = (to_west != null ? to_west.ID : -1);
+                }
+                return west_id;
+            }
+            set
+            {
+                west_id = value;
+            }
+        }
+
         private Room<T> to_north = null;
         private Room<T> to_south = null;
         private Room<T> to_east = null;
         private Room<T> to_west = null;
+        [JsonProperty]
+        private Vector2 origin;
+        [JsonProperty]
+        private int width;
+        [JsonProperty]
+        private int height;
+        [JsonProperty]
+        private List<Tile<T>> tiles = new List<Tile<T>>();
+        [JsonProperty]
+        private List<Tile<T>> worldObjects = new List<Tile<T>>();
 
         public int ID { get { return id; } set { id = value; } }
-        public List<T> Tiles { get; set; } = new List<T>();
-        public List<T> WorldObjects { get; set; } = new List<T>();
+        public List<Tile<T>> Tiles { get => tiles; set => tiles = value; }
+        public List<Tile<T>> WorldObjects { get => worldObjects; set => worldObjects = value; }
         public byte AttachedRoomCount
         {
             get
             {
-                return roomCount;
-            }
-            set
-            {
-                roomCount = value;
+                byte count = 0;
+                if (ToNorth != null) { count++; }
+                if (ToSouth != null) { count++; }
+                if (ToEast != null) { count++; }
+                if (ToWest != null) { count++; }
+
+                return count;
             }
         }
         public int[] AttachedRoomIDs
@@ -76,10 +182,10 @@ namespace DungeonGeneration
             }
         }
 
-        public Vector2 Origin { get; set; }
+        public Vector2 Origin { get => origin; set => origin = value; }
 
-        public int Width { get; private set; }
-        public int Height { get; private set; }
+        public int Width { get => width; }
+        public int Height { get => height; }
 
         // Adjacent Rooms
         public Room<T> ToNorth { get { return to_north; } set { to_north = value; } }
@@ -89,9 +195,9 @@ namespace DungeonGeneration
 
         public Room(Vector2 origin, int width = 0, int height = 0)
         {
-            Width = width;
-            Height = height;
-            Origin = origin;
+            this.width = width;
+            this.height = height;
+            this.origin = origin;
         }
 
         public void GetRooms(ref List<Room<T>> rooms)
@@ -102,8 +208,8 @@ namespace DungeonGeneration
         private void get_rooms(ref List<Room<T>> rooms, ref int lastRoomID)
         {
             rooms.Add(this);
-            if (AttachedRoomCount == 1)
-                return;
+            //if (AttachedRoomCount == 1)
+            //    return;
 
             if (ToNorth != null && ToNorth.ID != lastRoomID)
                 ToNorth.get_rooms(ref rooms, ref id);
@@ -118,31 +224,42 @@ namespace DungeonGeneration
     }
     public class DungeonGeneration<T>
     {
+        Room<T> rootRoom = null;
         #region MODEL_CONSTANTS
+        enum TILE_IDS { 
+            NORTH_WALL, SOUTH_WALL, EAST_WALL, WEST_WALL, 
+            NORTHWEST_CORNER, NORTHEAST_CORNER, SOUTHWEST_CORNER, SOUTHEAST_CORNER, 
+            FLOOR, 
+            NORTH_DOOR, SOUTH_DOOR, EAST_DOOR, WEST_DOOR,
+            SMALL_CHEST
+        }
+        private T[] tiles_available = new T[14];
         #region TILES
-        private T NORTH_WALL { get; set; }
-        private T SOUTH_WALL { get; set; }
-        private T EAST_WALL { get; set; }
-        private T WEST_WALL { get; set; }
+        private T NORTH_WALL { get { return tiles_available[(int)TILE_IDS.NORTH_WALL]; } set { tiles_available[(int)TILE_IDS.NORTH_WALL] = value; } }
+        private T SOUTH_WALL { get { return tiles_available[(int)TILE_IDS.SOUTH_WALL]; } set { tiles_available[(int)TILE_IDS.SOUTH_WALL] = value; } }
+        private T EAST_WALL { get { return tiles_available[(int)TILE_IDS.EAST_WALL]; } set { tiles_available[(int)TILE_IDS.EAST_WALL] = value; } }
+        private T WEST_WALL { get { return tiles_available[(int)TILE_IDS.WEST_WALL]; } set { tiles_available[(int)TILE_IDS.WEST_WALL] = value; } }
 
-        private T NORTHWEST_CORNER { get; set; }
-        private T NORTHEAST_CORNER { get; set; }
-        private T SOUTHWEST_CORNER { get; set; }
-        private T SOUTHEAST_CORNER { get; set; }
+        private T NORTHWEST_CORNER { get { return tiles_available[(int)TILE_IDS.NORTHWEST_CORNER]; } set { tiles_available[(int)TILE_IDS.NORTHWEST_CORNER] = value; } }
+        private T NORTHEAST_CORNER { get { return tiles_available[(int)TILE_IDS.NORTHEAST_CORNER]; } set { tiles_available[(int)TILE_IDS.NORTHEAST_CORNER] = value; } }
+        private T SOUTHWEST_CORNER { get { return tiles_available[(int)TILE_IDS.SOUTHWEST_CORNER]; } set { tiles_available[(int)TILE_IDS.SOUTHWEST_CORNER] = value; } }
+        private T SOUTHEAST_CORNER { get { return tiles_available[(int)TILE_IDS.SOUTHEAST_CORNER]; } set { tiles_available[(int)TILE_IDS.SOUTHEAST_CORNER] = value; } }
 
-        private T FLOOR { get; set; }
+        private T FLOOR { get { return tiles_available[(int)TILE_IDS.FLOOR]; } set { tiles_available[(int)TILE_IDS.FLOOR] = value; } }
         #endregion
         #region WORLD_OBJECTS
-        private T NORTH_DOOR { get; set; }
-        private T SOUTH_DOOR { get; set; }
-        private T EAST_DOOR { get; set; }
-        private T WEST_DOOR { get; set; }
+        private T NORTH_DOOR { get { return tiles_available[(int)TILE_IDS.NORTH_DOOR]; } set { tiles_available[(int)TILE_IDS.NORTH_DOOR] = value; } }
+        private T SOUTH_DOOR { get { return tiles_available[(int)TILE_IDS.SOUTH_DOOR]; } set { tiles_available[(int)TILE_IDS.SOUTH_DOOR] = value; } }
+        private T EAST_DOOR { get { return tiles_available[(int)TILE_IDS.EAST_DOOR]; } set { tiles_available[(int)TILE_IDS.EAST_DOOR] = value; } }
+        private T WEST_DOOR { get { return tiles_available[(int)TILE_IDS.WEST_DOOR]; } set { tiles_available[(int)TILE_IDS.WEST_DOOR] = value; } }
 
-        private T SMALL_CHEST { get; set; }
+        private T SMALL_CHEST { get { return tiles_available[(int)TILE_IDS.SMALL_CHEST]; } set { tiles_available[(int)TILE_IDS.SMALL_CHEST] = value; } }
         #endregion
         #endregion
 
         Random rand;
+
+        List<Room<T>> RoomList;
 
         int chestMin = 0, chestMax = 0;
 
@@ -185,7 +302,7 @@ namespace DungeonGeneration
             rand = new Random(seed);
         }
 
-        public Room<T> BuildDungeon(Vector2 origin, Vector2 width, Vector2 height, Vector2 rooms, Vector2 chests)
+        public List<Room<T>> BuildDungeon(Vector2 origin, Vector2 width, Vector2 height, Vector2 rooms, Vector2 chests)
         {
             List<T> temp = new List<T>();
 
@@ -199,14 +316,56 @@ namespace DungeonGeneration
             //for (int r = 1; r <= rooms; r++)
             BuildRoom(1, maxRooms, origin.X, origin.Y, width.X, width.Y, height.X, height.Y, ref room, CardinalDirections.NORTH);
 
-            return room;
+            rootRoom = room;
+            RoomList = new List<Room<T>>();
+            GetRoomList(ref RoomList, room);
+
+            /* TODO: Create List of Rooms to access 
+             */
+            return RoomList;
+        }
+        public void SaveDungeon (string directory)
+        {
+            // we haven't generated a dungeon so don't try to save it
+            if (rootRoom == null) { return; }
+            string jsonData = JsonConvert.SerializeObject(RoomList);
+
+            if (!System.IO.Directory.Exists($"{directory}")) { System.IO.Directory.CreateDirectory($"{directory}"); }
+            if (!System.IO.File.Exists($"{directory}/map.json")) { System.IO.File.Create($"{directory}/map.json"); }
+
+            using (System.IO.StreamWriter writer = new System.IO.StreamWriter($"{directory}/map.json"))
+            {
+                writer.WriteLine(jsonData);
+                writer.Close();
+            }
+        }
+        
+        public List<Room<T>> LoadDungeon (string directory)
+        {
+            string jsonData = "";
+            using (System.IO.StreamReader reader = new System.IO.StreamReader($"{directory}/map.json"))
+            {
+                jsonData = reader.ReadLine();
+                reader.Close();
+            }
+            RoomList = JsonConvert.DeserializeObject<List<Room<T>>>(jsonData);
+            foreach (var room in RoomList) { GetTileRoots(room); }
+            foreach (var room in RoomList)
+            {
+                room.ToNorth = RoomList.Where(r => r.ID == room.to_north_id).FirstOrDefault();
+                room.ToSouth = RoomList.Where(r => r.ID == room.to_south_id).FirstOrDefault();
+                room.ToEast = RoomList.Where(r => r.ID == room.to_east_id).FirstOrDefault();
+                room.ToWest = RoomList.Where(r => r.ID == room.to_west_id).FirstOrDefault();
+            }
+
+            return RoomList;
         }
 
         // Recursive Function 
         // Base case: roomNum > maxRooms
         private int BuildRoom(int roomNum, int maxRooms, int startX, int startY, int minWidth, int maxWidth, int minHeight, int maxHeight, ref Room<T> lastRoom, CardinalDirections roomDir)
         {
-            List<T> temp = new List<T>();
+            List<Tile<T>> temp = new List<Tile<T>>();
 
             // base case
             if (roomNum > maxRooms)
@@ -295,10 +454,10 @@ namespace DungeonGeneration
 
             return maxRoomNum;
         }
-        private void PrepareWorldObjects (int count, List<T> worldObjects)
+        private void PrepareWorldObjects (int count, List<Tile<T>> worldObjects)
         {
             for (int i = 0; i < count; i++)
-                worldObjects.Add(default);
+                worldObjects.Add(new Tile<T>());
         }
         private void SetAdjacency(int roomNum, CardinalDirections roomDir, ref Room<T> room, ref Room<T> lastRoom)
         {
@@ -357,8 +516,9 @@ namespace DungeonGeneration
             return available;
         }
 
-        private T placeCorners(int startX, int startY, int x, int y, int roomWidth, int roomHeight)
+        private Tile<T> placeCorners(int startX, int startY, int x, int y, int roomWidth, int roomHeight)
         {
+            Tile<T> tile = new Tile<T>();
             // If the x and y value pair does not equate to a corner, then return the default
             // value for type T and stop execution for this function
             if ((x != startX && x != roomWidth - 1) && (y != startY && y != roomHeight - 1))
@@ -367,15 +527,21 @@ namespace DungeonGeneration
             // if x and y equates to TopLeft Corner
             if (x == startX && y == startY)
             {
+                tile.Root = NORTHWEST_CORNER;
+                tile.WorldPoint = new Vector2(x + startX, y + startY);
+                tile.Id = (int)TILE_IDS.NORTHWEST_CORNER;
                 //place north west corner
-                return NORTHWEST_CORNER;
+                return tile;
             }
 
             // if x and y equates to TopRight corner
             else if (x == roomWidth - 1 && y == startY)
             {
                 //place north east corner
-                return NORTHEAST_CORNER;
+                tile.Root = NORTHEAST_CORNER;
+                tile.WorldPoint = new Vector2(x + startX, y + startY);
+                tile.Id = (int)TILE_IDS.NORTHEAST_CORNER;
+                return tile;
 
             }
 
@@ -383,7 +549,10 @@ namespace DungeonGeneration
             else if (y == roomHeight - 1 && x == startX)
             {
                 //place south west corner
-                return SOUTHWEST_CORNER;
+                tile.Root = SOUTHWEST_CORNER;
+                tile.WorldPoint = new Vector2(x + startX, y + startY);
+                tile.Id = (int)TILE_IDS.SOUTHWEST_CORNER;
+                return tile;
 
             }
 
@@ -391,75 +560,105 @@ namespace DungeonGeneration
             else if (y == roomHeight - 1 && x == roomWidth - 1)
             {
                 //place south east corner
-                return SOUTHEAST_CORNER;
+                tile.Root = SOUTHEAST_CORNER;
+                tile.WorldPoint = new Vector2(x + startX, y + startY);
+                tile.Id = (int)TILE_IDS.SOUTHEAST_CORNER;
+                return tile;
 
             }
             else return default;
         }
-        private T placeWalls(int startX, int startY, int x, int y, int roomWidth, int roomHeight)
+        private Tile<T> placeWalls(int startX, int startY, int x, int y, int roomWidth, int roomHeight)
         {
             // If the x and y value pair does not equate to a wall, then return the default
             // value for type T and stop execution for this function
             if ((x == startX || x == roomWidth - 1) && (y == startY || y == roomHeight - 1))
                 return default;
+            Tile<T> tile = new Tile<T>();
 
             // If x is on the Left Side of the room
             if (x == startX)
             {
                 // place west wall
-                return WEST_WALL;
+                tile.Root = WEST_WALL;
+                tile.WorldPoint = new Vector2(x + startX, y + startY);
+                tile.Id = (int)TILE_IDS.WEST_WALL;
+                return tile;
             }
             // If x is on the Right Side of the room
             else if (x == roomWidth - 1)
             {
                 // place east wall
-                return EAST_WALL;
+                tile.Root = EAST_WALL;
+                tile.WorldPoint = new Vector2(x + startX, y + startY);
+                tile.Id = (int)TILE_IDS.EAST_WALL;
+                return tile;
             }
             // If y is on the Top Side of the room
             else if (y == startY)
             {
                 // place north wall
-                return NORTH_WALL;
+                tile.Root = NORTH_WALL;
+                tile.WorldPoint = new Vector2(x + startX, y + startY);
+                tile.Id = (int)TILE_IDS.NORTH_WALL;
+                return tile;
             }
             // If Y is on the Bottom Side of the room
             else if (y == roomHeight - 1)
             {
                 // place south wall
-                return SOUTH_WALL;
+                tile.Root = SOUTH_WALL;
+                tile.WorldPoint = new Vector2(x + startX, y + startY);
+                tile.Id = (int)TILE_IDS.SOUTH_WALL;
+                return tile;
             }
             else return default;
         }
-        private T placeFloors(int startX, int startY, int x, int y, int roomWidth, int roomHeight)
+        private Tile<T> placeFloors(int startX, int startY, int x, int y, int roomWidth, int roomHeight)
         {
+            Tile<T> tile = new Tile<T>();
             if ((x >= startX + 1 && x <= roomWidth - 2) && (y >= startY + 1 && y <= roomHeight - 2))
-                return FLOOR;
+            {
+                tile.Root = FLOOR;
+                tile.WorldPoint = new Vector2(x + startX, y + startY);
+                tile.Id = (int)TILE_IDS.FLOOR;
+                return tile;
+            }
             else return default;
         }
 
         public enum CardinalDirections { NORTH, SOUTH, EAST, WEST }
-        private void placeDoors(int startX, int startY, int roomWidth, int roomHeight, int doorX, int doorY, Room<T> lastRoom, CardinalDirections side, List<T> worldObjects)
+        private void placeDoors(int startX, int startY, int roomWidth, int roomHeight, int doorX, int doorY, Room<T> lastRoom, CardinalDirections side, List<Tile<T>> worldObjects)
         {
             switch (side)
             {
                 case CardinalDirections.NORTH:
-                    lastRoom.WorldObjects[(doorX - lastRoom.Origin.X) + (lastRoom.Height - 1) * roomWidth] = NORTH_DOOR;
-                    worldObjects[(doorX - startX) + (doorY - startY) * roomWidth] = SOUTH_DOOR;
+                    lastRoom.WorldObjects[(doorX - lastRoom.Origin.X) + (lastRoom.Height - 1) * roomWidth].Root = NORTH_DOOR;
+                    lastRoom.WorldObjects[(doorX - lastRoom.Origin.X) + (lastRoom.Height - 1) * roomWidth].Id = (int)TILE_IDS.NORTH_DOOR;
+                    worldObjects[(doorX - startX) + (doorY - startY) * roomWidth].Root = SOUTH_DOOR;
+                    worldObjects[(doorX - startX) + (doorY - startY) * roomWidth].Id = (int)TILE_IDS.SOUTH_DOOR;
                     break;
                 case CardinalDirections.SOUTH:
-                    lastRoom.WorldObjects[(doorX - lastRoom.Origin.X) + (lastRoom.Height - 1) * roomWidth] = SOUTH_DOOR;
-                    worldObjects[(doorX - startX) + (doorY - startY) * roomWidth] = NORTH_DOOR;
+                    lastRoom.WorldObjects[(doorX - lastRoom.Origin.X) + (lastRoom.Height - 1) * roomWidth].Root = SOUTH_DOOR;
+                    lastRoom.WorldObjects[(doorX - lastRoom.Origin.X) + (lastRoom.Height - 1) * roomWidth].Id = (int)TILE_IDS.SOUTH_DOOR;
+                    worldObjects[(doorX - startX) + (doorY - startY) * roomWidth].Root = NORTH_DOOR;
+                    worldObjects[(doorX - startX) + (doorY - startY) * roomWidth].Id = (int)TILE_IDS.NORTH_DOOR;
                     break;
                 case CardinalDirections.EAST:
-                    lastRoom.WorldObjects[(lastRoom.Width - 1) + (doorY - lastRoom.Origin.Y) * roomWidth] = EAST_DOOR;
-                    worldObjects[(doorX - startX) + (doorY - startY) * roomWidth] = WEST_DOOR;
+                    lastRoom.WorldObjects[(doorX - lastRoom.Origin.X) + (lastRoom.Height - 1) * roomWidth].Root = EAST_DOOR;
+                    lastRoom.WorldObjects[(doorX - lastRoom.Origin.X) + (lastRoom.Height - 1) * roomWidth].Id = (int)TILE_IDS.EAST_DOOR;
+                    worldObjects[(doorX - startX) + (doorY - startY) * roomWidth].Root = WEST_DOOR;
+                    worldObjects[(doorX - startX) + (doorY - startY) * roomWidth].Id = (int)TILE_IDS.WEST_DOOR;
                     break;
                 case CardinalDirections.WEST:
-                    lastRoom.WorldObjects[(lastRoom.Width - 1) + (doorY - lastRoom.Origin.Y) * roomWidth] = WEST_DOOR;
-                    worldObjects[(doorX - startX) + (doorY - startY) * roomWidth] = EAST_DOOR;
+                    lastRoom.WorldObjects[(doorX - lastRoom.Origin.X) + (lastRoom.Height - 1) * roomWidth].Root = WEST_DOOR;
+                    lastRoom.WorldObjects[(doorX - lastRoom.Origin.X) + (lastRoom.Height - 1) * roomWidth].Id = (int)TILE_IDS.WEST_DOOR;
+                    worldObjects[(doorX - startX) + (doorY - startY) * roomWidth].Root = EAST_DOOR;
+                    worldObjects[(doorX - startX) + (doorY - startY) * roomWidth].Id = (int)TILE_IDS.EAST_DOOR;
                     break;
             }
         }
-        private void placeChests (int startX, int startY, int roomWidth, int roomHeight, List<T> worldObjects)
+        private void placeChests (int startX, int startY, int roomWidth, int roomHeight, List<Tile<T>> worldObjects)
         {
             try
             {
@@ -467,15 +666,44 @@ namespace DungeonGeneration
                 chestCount = rand.Next(chestMin, chestMax);
                 for (int i = 0; i < chestCount; i++)
                 {
-                    chestX = rand.Next(startX + 1, roomWidth - 1);
-                    chestY = rand.Next(startY + 1, roomHeight - 1);
+                    chestX = rand.Next(startX + 1, (roomWidth + startX) - 1);
+                    chestY = rand.Next(startY + 1, (roomHeight + startY) - 1);
 
-                    worldObjects[(chestX - startX) + (chestY - startY) * roomWidth] = SMALL_CHEST;
+                    worldObjects[(chestX - startX) + (chestY - startY) * roomWidth].Root = SMALL_CHEST;
+                    worldObjects[(chestX - startX) + (chestY - startY) * roomWidth].Id = (int)TILE_IDS.SMALL_CHEST;
                 }
             }
             catch (Exception ex)
             {
                 throw ex;
+            }
+        }
+
+        private void GetRoomList (ref List<Room<T>> rooms, Room<T> room)
+        {
+            if (room.AttachedRoomCount > 0 && !rooms.Contains(room)) 
+            {
+                rooms.Add(room);
+                if (room.ToNorth != null) { GetRoomList(ref rooms, room.ToNorth); }
+                if (room.ToSouth != null) { GetRoomList(ref rooms, room.ToSouth); }
+                if (room.ToEast != null) { GetRoomList(ref rooms, room.ToEast); }
+                if (room.ToWest != null) { GetRoomList(ref rooms, room.ToWest); }
+            }
+        }
+        private void GetTileRoots(Room<T> room)
+        {
+            for (int i = 0; i < room.Tiles.Count; i++)
+            {
+                room.Tiles[i].Root = tiles_available[room.Tiles[i].Id];
+                if (room.WorldObjects[i].Id > 0) { room.WorldObjects[i].Root = tiles_available[room.WorldObjects[i].Id]; }
+            }
+
+            if (room.AttachedRoomCount > 0)
+            {
+                if (room.ToNorth != null) { GetTileRoots(room.ToNorth); }
+                if (room.ToSouth != null) { GetTileRoots(room.ToSouth); }
+                if (room.ToEast != null) { GetTileRoots(room.ToEast); }
+                if (room.ToWest != null) { GetTileRoots(room.ToWest); }
             }
         }
     }
