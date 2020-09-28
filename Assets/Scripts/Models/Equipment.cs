@@ -13,21 +13,21 @@ public class Equipment : Item
     public EquipmentSlot slot;
     public Modifier modifier;
 
-    public AttackType attackType;
-    private IAttack attack;
+    //public AttackType attackType;
+    //private IAttack attack;
 
     public override void Start ()
     {
-        Debug.Log("Start Hit");
-        switch (attackType)
-        {
-            case AttackType.MELEE:
-                attack = new MeleeAttack();
-                break;
-            case AttackType.RANGED:
-                attack = new RangedAttack();
-                break;
-        }
+        //Debug.Log("Start Hit");
+        //switch (attackType)
+        //{
+        //    case AttackType.MELEE:
+        //        attack = new MeleeAttack();
+        //        break;
+        //    case AttackType.RANGED:
+        //        attack = new RangedAttack();
+        //        break;
+        //}
     }
     public override void Update()
     {
@@ -39,8 +39,8 @@ public class Equipment : Item
 
     public void Attack (Entity attacker, Entity target)
     {
-        if (attack != null)
-            attack.Attack(attacker, target);
+        //if (attack != null)
+        //    attack.Attack(attacker, target);
     }
 
     

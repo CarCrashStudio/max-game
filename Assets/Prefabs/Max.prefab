@@ -13,7 +13,10 @@ GameObject:
   - component: {fileID: 1175258850962916288}
   - component: {fileID: 1175258850962916290}
   - component: {fileID: 1175258850962916291}
+  - component: {fileID: 5509715896747393979}
   - component: {fileID: 4199870682548661965}
+  - component: {fileID: 4656626090294991972}
+  - component: {fileID: 1242429776}
   m_Layer: 9
   m_Name: Max
   m_TagString: Player
@@ -31,7 +34,8 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1.52, y: -0.96, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 6691739826578480648}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -50,6 +54,7 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -152,6 +157,109 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &5509715896747393979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1175258850962916293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01a29b2ae61927f42915bad235d5b979, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inputs:
+  - primaryKey: 105
+    secondaryKey: 0
+    teritiaryKey: 0
+    action:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 4199870682548661965}
+          m_TargetAssemblyTypeName: Player, Assembly-CSharp
+          m_MethodName: ToggleInventory
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - primaryKey: 101
+    secondaryKey: 99
+    teritiaryKey: 0
+    action:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 4199870682548661965}
+          m_TargetAssemblyTypeName: Player, Assembly-CSharp
+          m_MethodName: ToggleCharacterSheet
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - primaryKey: 32
+    secondaryKey: 0
+    teritiaryKey: 0
+    action:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 5011140883182302167}
+          m_TargetAssemblyTypeName: PlayerHealth, Assembly-CSharp
+          m_MethodName: Damage
+          m_Mode: 4
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 10
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - primaryKey: 104
+    secondaryKey: 0
+    teritiaryKey: 0
+    action:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 5011140883182302167}
+          m_TargetAssemblyTypeName: PlayerHealth, Assembly-CSharp
+          m_MethodName: Heal
+          m_Mode: 4
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 10
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - primaryKey: 106
+    secondaryKey: 0
+    teritiaryKey: 0
+    action:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 4656626090294991972}
+          m_TargetAssemblyTypeName: PlayerExperience, Assembly-CSharp
+          m_MethodName: GiveExperience
+          m_Mode: 4
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 1
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!114 &4199870682548661965
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -167,8 +275,6 @@ MonoBehaviour:
   level: 1
   speed: 4
   currentState: 0
-  health: {fileID: 11400000, guid: e5fc06acff3a0e846bcc9d2dfeef9663, type: 2}
-  healthSignal: {fileID: 0}
   attributes:
     strength: 10
     dexterity: 10
@@ -183,7 +289,14 @@ MonoBehaviour:
       intelligence_modifier: 0
       wisdom_modifier: 0
       charisma_modifier: 0
-    additionalModifiers:
+    equipmentModifiers:
+      strength_modifier: 0
+      dexterity_modifier: 0
+      constitution_modifier: 0
+      intelligence_modifier: 0
+      wisdom_modifier: 0
+      charisma_modifier: 0
+    buffModifiers:
       strength_modifier: 0
       dexterity_modifier: 0
       constitution_modifier: 0
@@ -209,6 +322,107 @@ MonoBehaviour:
   manager: {fileID: 0}
   currentlyInInteractable: 0
   gold: 5
+  health: {fileID: 0}
   invOpen: 0
   inventorySize: 12
   inventoryUI: {fileID: 0}
+  inventory:
+  - item: {fileID: 5713517289390518576, guid: ce922217ffc7690439bfb0b14f7087bf, type: 3}
+    quantity: 1
+  - item: {fileID: 577575069212101623, guid: 1caaceedd5a708142b9ec26eb360a808, type: 3}
+    quantity: 2
+  - item: {fileID: 0}
+    quantity: 0
+  - item: {fileID: 0}
+    quantity: 0
+  - item: {fileID: 0}
+    quantity: 0
+  - item: {fileID: 0}
+    quantity: 0
+  - item: {fileID: 0}
+    quantity: 0
+  - item: {fileID: 0}
+    quantity: 0
+  - item: {fileID: 0}
+    quantity: 0
+  - item: {fileID: 0}
+    quantity: 0
+  - item: {fileID: 0}
+    quantity: 0
+  - item: {fileID: 0}
+    quantity: 0
+--- !u!114 &4656626090294991972
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1175258850962916293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8d703998c8de9742b84f756b0d5ed1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  levelLength: 2
+  levelDifficulty: 3
+  maxExp: {fileID: 11400000, guid: 4e6c400319d92b04eac0325a69857007, type: 2}
+  currentExp: {fileID: 11400000, guid: f481257c68e82e743b761fbcb4046a74, type: 2}
+  experienceSignal: {fileID: 11400000, guid: c20403fbbce0bb146ac95df2d586570a, type: 2}
+--- !u!114 &1242429776
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1175258850962916293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f78c2fe829f27ef45a06ea2ee3e3a642, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &7238910035259584706
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6691739826578480648}
+  - component: {fileID: 5011140883182302167}
+  m_Layer: 9
+  m_Name: HurtBox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6691739826578480648
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7238910035259584706}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1175258850962916302}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5011140883182302167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7238910035259584706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b01a5ae47aee6643862db47eee9c9e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: {fileID: 11400000, guid: d2114ee658b755b4cada4eb06e566c05, type: 2}
+  currentHealth: 0
+  healthSignal: {fileID: 11400000, guid: 78aff940d266cb944a6690fd8c3cda08, type: 2}

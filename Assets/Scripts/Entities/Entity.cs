@@ -16,8 +16,6 @@ public class Entity : MonoBehaviour
 
     public EntityState currentState;
 
-    public Health health;
-    public Signal healthSignal;
     public Attributes attributes;
 
     public bool charOpen = false;

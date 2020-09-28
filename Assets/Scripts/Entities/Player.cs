@@ -13,8 +13,8 @@ public class Player : Entity
 {
     public DungeonManager manager;
     public bool currentlyInInteractable = false;
-    
     public float gold = 5f;
+    public int Level => level;
 
     #region INVENTORY
     public bool invOpen = false;
@@ -192,31 +192,8 @@ public class Player : Entity
         Vector2 velocity = Vector2.zero;
         velocity.x = Input.GetAxisRaw("Horizontal");
         velocity.y = Input.GetAxisRaw("Vertical");
-        
+
         moveEntity(velocity);
-        #endregion
-
-        #region INVENTORY
-        if (Input.GetButtonDown("inventory"))
-        {
-            if (!invOpen)
-                ReloadInventoryUI();
-
-            inventoryUI.SetActive(!invOpen);
-            invOpen = !invOpen;
-        }
-        currentlyInInteractable = invOpen;
-        currentState = (currentlyInInteractable) ? EntityState.INTERACTING : EntityState.IDLE;
-        #endregion
-        #region EQUIPMENT
-        if (Input.GetButtonDown("character"))
-        {
-            characterUI.SetActive(!charOpen);
-            charOpen = !charOpen;
-        }
-
-        currentlyInInteractable = charOpen;
-        currentState = (currentlyInInteractable) ? EntityState.INTERACTING : EntityState.IDLE;
         #endregion
 
         #region INTERACTION
@@ -232,6 +209,30 @@ public class Player : Entity
         }
         #endregion
         base.Update();
+    }
+
+    public void LevelUp ()
+    {
+        level++;
+    }
+    public void ToggleCharacterSheet()
+    {
+        characterUI.SetActive(!charOpen);
+        charOpen = !charOpen;
+
+        currentlyInInteractable = charOpen;
+        currentState = (currentlyInInteractable) ? EntityState.INTERACTING : EntityState.IDLE;
+    }
+    public void ToggleInventory()
+    {
+        if (!invOpen)
+            ReloadInventoryUI();
+
+        inventoryUI.SetActive(!invOpen);
+        invOpen = !invOpen;
+
+        currentlyInInteractable = invOpen;
+        currentState = (currentlyInInteractable) ? EntityState.INTERACTING : EntityState.IDLE;
     }
 
     public override string ToString()

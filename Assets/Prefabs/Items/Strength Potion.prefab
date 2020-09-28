@@ -47,6 +47,7 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -98,7 +99,10 @@ MonoBehaviour:
   name: Strength Potion
   description: Adds +1 to your strength modifier
   isDiscovered: 0
+  id: 1
+  cooldownTime: 30
   isDrinkable: 1
   isThrowable: 0
   buffTarget: 0
   buffAmount: 1
+  throwRadius: 0

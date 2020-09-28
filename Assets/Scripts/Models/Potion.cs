@@ -5,17 +5,25 @@ using UnityEngine;
 
 public enum BuffTarget { STRENGTH, DEXTERITY, CONSTITUTION, INTELLIGENCE, WISDOM, CHARISMA, HEALTH, CURRENCY }
 [Serializable]
-public class Potion : Item
+public class Potion : Item, IHasCooldown
 {
+    [SerializeField] private int id = 0;
+    [SerializeField] private float cooldownTime = 30;
     [SerializeField] private bool isDrinkable;
     [SerializeField] private bool isThrowable;
     [SerializeField] private BuffTarget buffTarget;
     [SerializeField] private int buffAmount;
     [SerializeField] private float throwRadius;
 
+    private CooldownManager cooldownManager;
+
+    public int ID => id;
+    public float CooldownTime => cooldownTime;
+
     public override void Start()
     {
-
+        cooldownManager = FindObjectOfType<CooldownManager>();
+        Debug.Log(cooldownManager);
     }
 
     public override void Update()
@@ -25,6 +33,7 @@ public class Potion : Item
 
     public override void Use()
     {
+        if (cooldownManager.IsOnCooldown(ID)) { return; }
         // call the base Use to discover the item if it isn't already
         base.Use();
 
@@ -33,7 +42,8 @@ public class Potion : Item
             ApplyBuff(
                 FindObjectOfType<Player>()); 
         }
-        
+
+        cooldownManager.PutOnCooldown(this);
     }
 
     private void ApplyBuff (object target)
@@ -41,7 +51,10 @@ public class Potion : Item
         switch (buffTarget)
         {
             case BuffTarget.HEALTH:
-                ((Entity)target).health.Heal(buffAmount);
+                if (target is Player) { }
+                    //((Player)target).health.Heal(buffAmount);
+                else 
+                    ((Enemy)target).health.Heal(buffAmount);
                 break;
             case BuffTarget.STRENGTH:
                 var str = ((Entity)target).attributes.buffModifiers.Strength;

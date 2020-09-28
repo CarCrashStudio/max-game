@@ -11,8 +11,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using Newtonsoft.Json;
 
 namespace DungeonGeneration
@@ -73,14 +71,10 @@ namespace DungeonGeneration
         int west_id = -1;
 
         [JsonProperty]
-        public int to_north_id
+        public int NorthID
         {
             get
             {
-                if (north_id == -1)
-                {
-                    north_id = (to_north != null ? to_north.ID : -1);
-                }
                 return north_id;
             }
             set
@@ -89,14 +83,10 @@ namespace DungeonGeneration
             }
         }
         [JsonProperty]
-        public int to_south_id
+        public int SouthID
         {
             get
             {
-                if (south_id == -1)
-                {
-                    south_id = (to_south != null ? to_south.ID : -1);
-                }
                 return south_id;
             }
             set
@@ -105,14 +95,10 @@ namespace DungeonGeneration
             }
         }
         [JsonProperty]
-        public int to_east_id
+        public int EastID
         {
             get
             {
-                if (east_id == -1)
-                {
-                    east_id = (to_east != null ? to_east.ID : -1);
-                }
                 return east_id;
             }
             set
@@ -121,14 +107,10 @@ namespace DungeonGeneration
             }
         }
         [JsonProperty]
-        public int to_west_id
+        public int WestID
         {
             get
             {
-                if (west_id == -1)
-                {
-                    west_id = (to_west != null ? to_west.ID : -1);
-                }
                 return west_id;
             }
             set
@@ -137,10 +119,6 @@ namespace DungeonGeneration
             }
         }
 
-        private Room<T> to_north = null;
-        private Room<T> to_south = null;
-        private Room<T> to_east = null;
-        private Room<T> to_west = null;
         [JsonProperty]
         private Vector2 origin;
         [JsonProperty]
@@ -160,25 +138,12 @@ namespace DungeonGeneration
             get
             {
                 byte count = 0;
-                if (ToNorth != null) { count++; }
-                if (ToSouth != null) { count++; }
-                if (ToEast != null) { count++; }
-                if (ToWest != null) { count++; }
+                if (NorthID != -1) { count++; }
+                if (SouthID != -1) { count++; }
+                if (EastID != -1) { count++; }
+                if (WestID != -1) { count++; }
 
                 return count;
-            }
-        }
-        public int[] AttachedRoomIDs
-        {
-            get
-            {
-                return new int[]
-                {
-                    (ToNorth != null) ? ToNorth.ID : 0,
-                    (ToSouth != null) ? ToSouth.ID : 0,
-                    (ToEast != null) ? ToEast.ID : 0,
-                    (ToWest != null) ? ToWest.ID : 0,
-                };
             }
         }
 
@@ -187,40 +152,12 @@ namespace DungeonGeneration
         public int Width { get => width; }
         public int Height { get => height; }
 
-        // Adjacent Rooms
-        public Room<T> ToNorth { get { return to_north; } set { to_north = value; } }
-        public Room<T> ToSouth { get { return to_south; } set { to_south = value; } }
-        public Room<T> ToEast { get { return to_east; } set { to_east = value; } }
-        public Room<T> ToWest { get { return to_west; } set { to_west = value; } }
-
         public Room(Vector2 origin, int width = 0, int height = 0)
         {
             this.width = width;
             this.height = height;
             this.origin = origin;
         }
-
-        public void GetRooms(ref List<Room<T>> rooms)
-        {
-            get_rooms(ref rooms, ref id);
-        }
-
-        private void get_rooms(ref List<Room<T>> rooms, ref int lastRoomID)
-        {
-            rooms.Add(this);
-            //if (AttachedRoomCount == 1)
-            //    return;
-
-            if (ToNorth != null && ToNorth.ID != lastRoomID)
-                ToNorth.get_rooms(ref rooms, ref id);
-            if (ToSouth != null && ToSouth.ID != lastRoomID)
-                ToSouth.get_rooms(ref rooms, ref id);
-            if (ToEast != null && ToEast.ID != lastRoomID)
-                ToEast.get_rooms(ref rooms, ref id);
-            if (ToWest != null && ToWest.ID != lastRoomID)
-                ToWest.get_rooms(ref rooms, ref id);
-        }
-
     }
     public class DungeonGeneration<T>
     {
@@ -313,15 +250,9 @@ namespace DungeonGeneration
             Room<T> room = new Room<T>(origin, 0, 0);
             int maxRooms = rand.Next(rooms.X, rooms.Y);
 
-            //for (int r = 1; r <= rooms; r++)
+            RoomList = new List<Room<T>>();
             BuildRoom(1, maxRooms, origin.X, origin.Y, width.X, width.Y, height.X, height.Y, ref room, CardinalDirections.NORTH);
 
-            rootRoom = room;
-            RoomList = new List<Room<T>>();
-            GetRoomList(ref RoomList, room);
-
-            /* TODO: Create List of Rooms to access 
-             */
             return RoomList;
         }
         public void SaveDungeon (string directory)
@@ -339,7 +270,6 @@ namespace DungeonGeneration
                 writer.Close();
             }
         }
-        
         public List<Room<T>> LoadDungeon (string directory)
         {
             string jsonData = "";
@@ -350,13 +280,6 @@ namespace DungeonGeneration
             }
             RoomList = JsonConvert.DeserializeObject<List<Room<T>>>(jsonData);
             foreach (var room in RoomList) { GetTileRoots(room); }
-            foreach (var room in RoomList)
-            {
-                room.ToNorth = RoomList.Where(r => r.ID == room.to_north_id).FirstOrDefault();
-                room.ToSouth = RoomList.Where(r => r.ID == room.to_south_id).FirstOrDefault();
-                room.ToEast = RoomList.Where(r => r.ID == room.to_east_id).FirstOrDefault();
-                room.ToWest = RoomList.Where(r => r.ID == room.to_west_id).FirstOrDefault();
-            }
 
             return RoomList;
         }
@@ -440,18 +363,22 @@ namespace DungeonGeneration
             placeChests(startX, startY, roomWidth, roomHeight, room.WorldObjects);
 
             var availability = FindAvailability(room);
+            
             int roomsToAdd = rand.Next(0, availability.Count);
-
+            roomsToAdd = rand.Next(0, availability.Count);
+            roomsToAdd = rand.Next(0, availability.Count);
+            roomsToAdd = rand.Next(0, availability.Count);
             if (roomsToAdd > maxRooms)
                 roomsToAdd = maxRooms;
             int maxRoomNum = roomNum;
             for (int i = 1; i <= roomsToAdd; i++)
             {
-                var dir = (CardinalDirections)Enum.Parse(typeof(CardinalDirections), i.ToString());
+                //var j = rand.Next(0, i);
+                var dir = (CardinalDirections)Enum.Parse(typeof(CardinalDirections), (i - 1).ToString());
                 // the startx and starty should be the position of the last door, offset by a certain amount in the direction ofthe axis not wall dominant.
                 maxRoomNum = BuildRoom(i + maxRoomNum, maxRooms, startX, startY, minWidth, maxWidth, minHeight, maxHeight, ref room, dir);
             }
-
+            RoomList.Add(room);
             return maxRoomNum;
         }
         private void PrepareWorldObjects (int count, List<Tile<T>> worldObjects)
@@ -466,20 +393,20 @@ namespace DungeonGeneration
                 switch (roomDir)
                 {
                     case CardinalDirections.NORTH:
-                        room.ToSouth = lastRoom;
-                        lastRoom.ToNorth = room;
+                        room.SouthID = lastRoom.ID;
+                        lastRoom.NorthID = room.ID;
                         break;
                     case CardinalDirections.SOUTH:
-                        room.ToNorth = lastRoom;
-                        lastRoom.ToSouth = room;
+                        room.NorthID = lastRoom.ID;
+                        lastRoom.SouthID = room.ID;
                         break;
                     case CardinalDirections.EAST:
-                        room.ToWest = lastRoom;
-                        lastRoom.ToEast = room;
+                        room.WestID = lastRoom.ID;
+                        lastRoom.EastID = room.ID;
                         break;
                     case CardinalDirections.WEST:
-                        room.ToEast = lastRoom;
-                        lastRoom.ToWest = room;
+                        room.EastID = lastRoom.ID;
+                        lastRoom.WestID = room.ID;
                         break;
                 }
             }
@@ -496,19 +423,19 @@ namespace DungeonGeneration
                 switch (i)
                 {
                     case (int)CardinalDirections.NORTH:
-                        if (room.ToNorth == null)
+                        if (room.NorthID == -1)
                             available.Add(CardinalDirections.NORTH);
                         break;
                     case (int)CardinalDirections.SOUTH:
-                        if (room.ToSouth == null)
+                        if (room.SouthID == -1)
                             available.Add(CardinalDirections.SOUTH);
                         break;
                     case (int)CardinalDirections.EAST:
-                        if (room.ToEast == null)
+                        if (room.EastID == -1)
                             available.Add(CardinalDirections.EAST);
                         break;
                     case (int)CardinalDirections.WEST:
-                        if (room.ToWest == null)
+                        if (room.WestID == -1)
                             available.Add(CardinalDirections.WEST);
                         break;
                 }
@@ -679,31 +606,12 @@ namespace DungeonGeneration
             }
         }
 
-        private void GetRoomList (ref List<Room<T>> rooms, Room<T> room)
-        {
-            if (room.AttachedRoomCount > 0 && !rooms.Contains(room)) 
-            {
-                rooms.Add(room);
-                if (room.ToNorth != null) { GetRoomList(ref rooms, room.ToNorth); }
-                if (room.ToSouth != null) { GetRoomList(ref rooms, room.ToSouth); }
-                if (room.ToEast != null) { GetRoomList(ref rooms, room.ToEast); }
-                if (room.ToWest != null) { GetRoomList(ref rooms, room.ToWest); }
-            }
-        }
         private void GetTileRoots(Room<T> room)
         {
             for (int i = 0; i < room.Tiles.Count; i++)
             {
                 room.Tiles[i].Root = tiles_available[room.Tiles[i].Id];
                 if (room.WorldObjects[i].Id > 0) { room.WorldObjects[i].Root = tiles_available[room.WorldObjects[i].Id]; }
-            }
-
-            if (room.AttachedRoomCount > 0)
-            {
-                if (room.ToNorth != null) { GetTileRoots(room.ToNorth); }
-                if (room.ToSouth != null) { GetTileRoots(room.ToSouth); }
-                if (room.ToEast != null) { GetTileRoots(room.ToEast); }
-                if (room.ToWest != null) { GetTileRoots(room.ToWest); }
             }
         }
     }

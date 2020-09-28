@@ -6,6 +6,7 @@ public class Enemy : Entity
 {
     public string enemyName;
 
+    public Health health;
     public LootTable lootTable;
 
     private GameObject player;

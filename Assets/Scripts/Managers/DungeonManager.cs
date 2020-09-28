@@ -56,6 +56,8 @@ public class DungeonManager : MonoBehaviour
     [Header("Editor Properties")]
     public bool autoUpdate = false;
 
+    private List<Room<GameObject>> roomsInDungeon;
+
     private void Start()
     {
         roomManager.Start();
@@ -77,8 +79,11 @@ public class DungeonManager : MonoBehaviour
         roomManager = new RoomManager();
         if (player == null) { player = FindObjectOfType<Player>(); }
         player.manager = this;
+
         try
         {
+            // Set our maximums equal to the minimum value in each set
+            // if the minimum is greater than the maximum
             if (roomWidth.x > roomWidth.y)
                 roomWidth.y = roomWidth.x;
             if (roomHeight.x > roomHeight.y)
@@ -90,13 +95,13 @@ public class DungeonManager : MonoBehaviour
 
             generation = new DungeonGeneration<GameObject>(northWall, southWall, eastWall, westWall, northwestCorner, northeastCorner, southwestCorner, southeastCorner, northDoor, southDoor, eastDoor, westDoor, floor, smallChest, dungeonSeed);
 
-            List<Room<GameObject>> rooms = generation.BuildDungeon(new DungeonGeneration.Vector2(0, 0), 
-                                                            new DungeonGeneration.Vector2(roomWidth.x, roomWidth.y), 
-                                                            new DungeonGeneration.Vector2(roomHeight.x, roomHeight.y), 
-                                                            new DungeonGeneration.Vector2(roomCount.x, roomCount.y), 
-                                                            new DungeonGeneration.Vector2(chestCount.x, chestCount.y));
-            rooms = rooms.OrderBy(r => r.ID).ToList();
-            BuildAllRooms(rooms);
+            roomsInDungeon = generation.BuildDungeon(origin: new DungeonGeneration.Vector2(0, 0), 
+                                                     width:  new DungeonGeneration.Vector2(roomWidth.x, roomWidth.y), 
+                                                     height: new DungeonGeneration.Vector2(roomHeight.x, roomHeight.y), 
+                                                     rooms:  new DungeonGeneration.Vector2(roomCount.x, roomCount.y), 
+                                                     chests: new DungeonGeneration.Vector2(chestCount.x, chestCount.y));
+            roomsInDungeon = roomsInDungeon.OrderBy(r => r.ID).ToList();
+            BuildAllRooms(roomsInDungeon);
         }
         catch (System.Exception ex)
         {
@@ -108,27 +113,23 @@ public class DungeonManager : MonoBehaviour
     {
         var pos = roomManager.currentRoom.GetComponent<Room>().roomPos;
         var size = roomManager.currentRoom.GetComponent<Room>().roomSize;
-
+        //Debug.Log(pos);
+        //Debug.Log(size);
         float height = Mathf.Round(2f * mainCamera.orthographicSize / mainCamera.rect.height);
         float width = Mathf.Round(height * mainCamera.aspect / mainCamera.rect.width);
+        //Debug.Log($"{height}, {width}");
 
-        UnityEngine.Vector2 min = new UnityEngine.Vector2(pos.x + (size.x - Mathf.Round(width / 2)), pos.y - Mathf.Round(height / 2));
-        UnityEngine.Vector2 max = new UnityEngine.Vector2(pos.x + Mathf.Round(width / 2), pos.y - (size.y - Mathf.Round(height / 2)));
-        if (min.x < pos.x)
-            min.x = pos.x;
-        if (min.y > pos.y)
-            min.y = pos.y;
+        //UnityEngine.Vector2 min = new UnityEngine.Vector2(pos.x + (size.x - Mathf.Round(width / 2)), pos.y - Mathf.Round(height / 2));
+        //UnityEngine.Vector2 max = new UnityEngine.Vector2(pos.x + Mathf.Round(width / 2), pos.y - (size.y - Mathf.Round(height / 2)));
 
-        //if (min.x >= max.x && min.y > max.y)
-        //{
-        //    UnityEngine.Vector2 temp = min;
-        //    min = max;
-        //    max = temp;
-        //}
+        //if (min.x < pos.x)
+        //    min.x = pos.x;
+        //if (min.y > pos.y)
+        //    min.y = pos.y;
 
-        mainCamera.GetComponent<CameraMovement>().minClamp = min;
-        mainCamera.GetComponent<CameraMovement>().maxClamp = max;
-        mainCamera.transform.position = new Vector3(min.x, min.y, -1);
+        mainCamera.GetComponent<CameraMovement>().minClamp = pos;
+        mainCamera.GetComponent<CameraMovement>().maxClamp = new UnityEngine.Vector2((pos + size).x, (-(pos + size)).y);
+        mainCamera.transform.position = new Vector3(pos.x, pos.y, -1);
     }
     public void BuildAllRooms (List<Room<GameObject>> rooms)
     {
@@ -140,7 +141,6 @@ public class DungeonManager : MonoBehaviour
 
             roomT.GetComponent<Room>().roomPos = new UnityEngine.Vector2(room.Origin.X, -room.Origin.Y);
             roomT.GetComponent<Room>().roomSize = new UnityEngine.Vector2(room.Width, room.Height);
-            room.Root = roomT;
             roomT.GetComponent<Room>().roomDets = room;
 
             roomT.tag = "room";
@@ -173,6 +173,7 @@ public class DungeonManager : MonoBehaviour
             }
 
             
+            room.Root = roomT;
             this.rooms[i] = roomT;
             i++;
         }
@@ -202,38 +203,43 @@ public class DungeonManager : MonoBehaviour
         {
             // get a list of all door objects
             var doors = room.roomDets.WorldObjects.Where(t => t.Root == northDoor || t.Root == southDoor || t.Root == eastDoor || t.Root == westDoor).Select(t => t.Root).ToList();
-
             // set tart clamps, target rooms, and other info
             foreach (var door in doors)
             {
                 door.GetComponent<SceneChange>().roomManager = roomManager;
                 door.GetComponent<SceneChange>().cam = mainCamera;
-
                 // target rooms depends on which door type this is
                 if (door == northDoor)
                 {
-
-                    door.GetComponent<SceneChange>().targetRoom = FindRoom(room.roomDets.ToNorth.Root.GetComponent<Room>());
+                    var ToNorth = roomsInDungeon.Where(r => r.ID == room.roomDets.NorthID).FirstOrDefault();
+                    if (ToNorth == null) { continue; }
+                    door.GetComponent<SceneChange>().targetRoom = FindRoom(ToNorth.Root.GetComponent<Room>());
                     door.GetComponent<SceneChange>().playerChange = new UnityEngine.Vector2(0, 5);
-                    door.GetComponent<SceneChange>().cameraChange = new UnityEngine.Vector2(0, room.roomDets.ToNorth.Height);
+                    door.GetComponent<SceneChange>().cameraChange = new UnityEngine.Vector2(0, -ToNorth.Height);
                 }
                 else if (door == southDoor)
                 {
-                    door.GetComponent<SceneChange>().targetRoom = FindRoom(room.roomDets.ToSouth.Root.GetComponent<Room>());
+                    var ToSouth = roomsInDungeon.Where(r => r.ID == room.roomDets.SouthID).FirstOrDefault();
+                    if (ToSouth == null) { continue; }
+                    door.GetComponent<SceneChange>().targetRoom = FindRoom(ToSouth.Root.GetComponent<Room>());
                     door.GetComponent<SceneChange>().playerChange = new UnityEngine.Vector2(0, -5);
-                    door.GetComponent<SceneChange>().cameraChange = new UnityEngine.Vector2(0, -room.roomDets.ToSouth.Height);
+                    door.GetComponent<SceneChange>().cameraChange = new UnityEngine.Vector2(0, ToSouth.Height);
                 }
                 else if (door == eastDoor)
                 {
-                    door.GetComponent<SceneChange>().targetRoom = FindRoom(room.roomDets.ToEast.Root.GetComponent<Room>());
+                    var ToEast = roomsInDungeon.Where(r => r.ID == room.roomDets.EastID).FirstOrDefault();
+                    if (ToEast == null) { continue; }
+                    door.GetComponent<SceneChange>().targetRoom = FindRoom(ToEast.Root.GetComponent<Room>());
                     door.GetComponent<SceneChange>().playerChange = new UnityEngine.Vector2(5, 0);
-                    door.GetComponent<SceneChange>().cameraChange = new UnityEngine.Vector2(room.roomDets.ToEast.Width, 0);
+                    door.GetComponent<SceneChange>().cameraChange = new UnityEngine.Vector2(-ToEast.Width, 0);
                 }
                 else if (door == westDoor)
                 {
-                    door.GetComponent<SceneChange>().targetRoom = FindRoom(room.roomDets.ToWest.Root.GetComponent<Room>());
+                    var ToWest = roomsInDungeon.Where(r => r.ID == room.roomDets.NorthID).FirstOrDefault();
+                    if (ToWest == null) { continue; }
+                    door.GetComponent<SceneChange>().targetRoom = FindRoom(ToWest.Root.GetComponent<Room>());
                     door.GetComponent<SceneChange>().playerChange = new UnityEngine.Vector2(-5, 0);
-                    door.GetComponent<SceneChange>().cameraChange = new UnityEngine.Vector2(-room.roomDets.ToWest.Width, 0);
+                    door.GetComponent<SceneChange>().cameraChange = new UnityEngine.Vector2(ToWest.Width, 0);
                 }
             }
         }

@@ -1,20 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-
-[CreateAssetMenu]
-public class Health : ScriptableObject
+﻿using UnityEngine;
+public class Health : MonoBehaviour
 {
-    [SerializeField] protected float maxHealth;
+    [SerializeField] protected FloatValue maxHealth;
     [SerializeField] protected float currentHealth;
+
+    public void Start()
+    {
+        currentHealth = maxHealth.initialValue;
+    }
 
     public string GetHealth ()
     {
         return string.Concat(currentHealth.ToString(), "/", maxHealth.ToString());
     }
+
     /// <summary>
     /// 
     /// </summary>
@@ -22,12 +21,14 @@ public class Health : ScriptableObject
     public virtual void Heal (float amt)
     {
         currentHealth += amt;
-        if (currentHealth > maxHealth)
-            currentHealth = maxHealth;
+        if (currentHealth > maxHealth.initialValue)
+            currentHealth = maxHealth.initialValue;
+        maxHealth.runtimeValue = currentHealth;
     }
     public virtual void FullHeal ()
     {
-        currentHealth = maxHealth;
+        currentHealth = maxHealth.initialValue;
+        maxHealth.runtimeValue = currentHealth;
     }
 
     /// <summary>
@@ -39,9 +40,11 @@ public class Health : ScriptableObject
         currentHealth -= amt;
         if (currentHealth < 0)
             currentHealth = 0;
+        maxHealth.runtimeValue = currentHealth;
     }
     public virtual void InstantKill()
     {
         currentHealth = 0;
+        maxHealth.runtimeValue = currentHealth;
     }
 }
