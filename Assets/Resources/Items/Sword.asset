@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03cbb5cb0210cbe4f8875fe2714c14e0, type: 3}
+  m_Name: Sword
+  m_EditorClassIdentifier: 
+  name: Sword
+  description: A Sword
+  isDiscovered: 0
+  sprite: {fileID: 4694007364678901417, guid: c3cc19c064e1cdd448a950b86b0a9062, type: 3}
+  type: 1
+  slot: 4
+  modifier:
+    strength_modifier: 2
+    dexterity_modifier: 0
+    constitution_modifier: 0
+    intelligence_modifier: 0
+    wisdom_modifier: 0
+    charisma_modifier: 0

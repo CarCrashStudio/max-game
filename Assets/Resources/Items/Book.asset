@@ -9,8 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe2f41641203e6b47bbe211133a8448c, type: 3}
-  m_Name: PlayerMaxExperience
+  m_Script: {fileID: 11500000, guid: b45a3ef86e620f946903188fb072455a, type: 3}
+  m_Name: Book
   m_EditorClassIdentifier: 
-  initialValue: 10
-  runtimeValue: 10
+  name: Book
+  description: Adds +1 to Knowledge rolls when equipped.
+  isDiscovered: 0
+  sprite: {fileID: -3154850044925739375, guid: c5b140d02950bec4cb23b613e303f210, type: 3}

@@ -277,9 +277,7 @@ public class DungeonManager : MonoBehaviour
                     var loot = table.GetLoot();
                     if (loot != null)
                     {
-                        chest.GetComponent<Chest>().inventory[i] = new InventoryItem();
-                        chest.GetComponent<Chest>().inventory[i].item = loot.item;
-                        chest.GetComponent<Chest>().inventory[i].quantity = loot.quantity;
+                        chest.GetComponent<Chest>().inventory[i] = new InventoryItem(loot.item, loot.quantity);
                     }
                 }
             }

@@ -15,7 +15,6 @@ public class HealthManager : MonoBehaviour
     }
     public void UpdateHealth ()
     {
-        Debug.Log("Hit");
         healthBar.current = playerCurrentHealth.runtimeValue;
         playerCurrentHealthText.text = $"{playerCurrentHealth.runtimeValue} / {playerCurrentHealth.initialValue}";
     }

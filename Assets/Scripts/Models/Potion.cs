@@ -15,22 +15,10 @@ public class Potion : Item, IHasCooldown
     [SerializeField] private int buffAmount;
     [SerializeField] private float throwRadius;
 
-    private CooldownManager cooldownManager;
+    private CooldownManager cooldownManager => GameObject.FindObjectOfType<CooldownManager>();
 
     public int ID => id;
     public float CooldownTime => cooldownTime;
-
-    public override void Start()
-    {
-        cooldownManager = FindObjectOfType<CooldownManager>();
-        Debug.Log(cooldownManager);
-    }
-
-    public override void Update()
-    {
-
-    }
-
     public override void Use()
     {
         if (cooldownManager.IsOnCooldown(ID)) { return; }
@@ -40,7 +28,7 @@ public class Potion : Item, IHasCooldown
         if (isDrinkable) 
         { 
             ApplyBuff(
-                FindObjectOfType<Player>()); 
+                GameObject.FindObjectOfType<Player>()); 
         }
 
         cooldownManager.PutOnCooldown(this);

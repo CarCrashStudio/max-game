@@ -4,44 +4,34 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public enum EquipmentType { ARMOR, WEAPON }
-public enum EquipmentSlot { HEAD, TORSO, LEGS, BOOT, ARMS, MAINHAND }
+public enum EquipmentSlotType { HEAD, TORSO, LEGS, BOOT, MAINHAND, OFFHAND, POTION }
 
 [Serializable]
-public class Equipment : Item
+[CreateAssetMenu]
+public class Equipment : Item, IHasCooldown
 {
     public EquipmentType type;
-    public EquipmentSlot slot;
+    public EquipmentSlotType slot;
     public Modifier modifier;
+
+    [SerializeField] private int id;
+    [SerializeField] private float cooldownTime;
+
+    private CooldownManager cooldownManager => GameObject.FindObjectOfType<CooldownManager>();
+
+    public int ID => id;
+
+    public float CooldownTime => cooldownTime;
 
     //public AttackType attackType;
     //private IAttack attack;
 
-    public override void Start ()
-    {
-        //Debug.Log("Start Hit");
-        //switch (attackType)
-        //{
-        //    case AttackType.MELEE:
-        //        attack = new MeleeAttack();
-        //        break;
-        //    case AttackType.RANGED:
-        //        attack = new RangedAttack();
-        //        break;
-        //}
-    }
-    public override void Update()
-    {
-    }
     public override void Use()
     {
+        if (cooldownManager.IsOnCooldown(ID)) { return; }
 
+        base.Use();
+
+        cooldownManager.PutOnCooldown(this);
     }
-
-    public void Attack (Entity attacker, Entity target)
-    {
-        //if (attack != null)
-        //    attack.Attack(attacker, target);
-    }
-
-    
 }

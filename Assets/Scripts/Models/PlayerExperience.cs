@@ -14,7 +14,6 @@ public class PlayerExperience : Experience
 
     public override void GiveExperience(float amt)
     {
-        Debug.Log("Hit");
        base.GiveExperience(amt);
         
         if (currentExp.runtimeValue >= maxExp.runtimeValue)

@@ -17,15 +17,11 @@ public class Chest : Interactable
             Reload();
             active = true;
             chestUI.SetActive(true);
-            interacter.GetComponent<Player>().inventoryUI.SetActive(true);
-            interacter.GetComponent<Player>().invOpen = true;
         }
         else
         {
             active = false;
             chestUI.SetActive(false);
-            interacter.GetComponent<Player>().inventoryUI.SetActive(false);
-            interacter.GetComponent<Player>().invOpen = false;
         }
     }
 
@@ -46,7 +42,7 @@ public class Chest : Interactable
                 {
 
                     cell.transform.GetChild(1).GetComponent<Text>().text = inventory[i].quantity.ToString();
-                    cell.transform.GetChild(0).GetComponent<Image>().sprite = inventory[i].item.GetComponent<SpriteRenderer>().sprite;
+                    cell.transform.GetChild(0).GetComponent<Image>().sprite = inventory[i].item.sprite;
                     var ii = inventory[i];
                     cell.transform.GetChild(0).GetComponent<Button>().onClick.RemoveAllListeners();
                     cell.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => { Loot(ii); });
@@ -71,7 +67,6 @@ public class Chest : Interactable
     {
         if (player.currentlyInInteractable)
         {
-            player.PickUp(ii);
             for (int i = 0; i < inventory.Length -1; i++)
             {
                 if (inventory[i] == ii)
@@ -81,7 +76,6 @@ public class Chest : Interactable
                 }
             }
             Reload();
-            player.ReloadInventoryUI();
         }
     }
 
