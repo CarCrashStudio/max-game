@@ -41,8 +41,8 @@ public class Potion : Item, IHasCooldown
             case BuffTarget.HEALTH:
                 if (target is Player) { }
                     //((Player)target).health.Heal(buffAmount);
-                else 
-                    ((Enemy)target).health.Heal(buffAmount);
+                else { }
+                    //((Enemy)target).health.Heal(buffAmount);
                 break;
             case BuffTarget.STRENGTH:
                 var str = ((Entity)target).attributes.buffModifiers.Strength;

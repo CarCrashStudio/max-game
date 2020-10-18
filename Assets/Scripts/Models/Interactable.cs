@@ -2,35 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Interactable : MonoBehaviour
+public interface IInteractable
 {
-    public bool entered;
-    protected bool active;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    bool Entered { get; }
+    bool Active { get; }
+    void OnInteractableEnter(IInteracter interacter);
+    void OnInteractableExit(IInteracter interacter);
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            entered = true;
-        }
-    }
-    void OnTriggerExit2D(Collider2D other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            entered = false;
-        }
-    }
-
-    public abstract void Interact(GameObject interacter);
+    void Interact(GameObject interacter);
 }

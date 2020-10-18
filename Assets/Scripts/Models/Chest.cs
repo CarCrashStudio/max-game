@@ -3,26 +3,31 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public enum ChestType { SMALL, LARGE }
-public class Chest : Interactable
+public class Chest : IInteractable
 {
     public ChestType type;
     public InventoryItem[] inventory;
     public Player player;
 
     public GameObject chestUI;
-    public override void Interact(GameObject interacter)
+
+    public bool Entered => throw new System.NotImplementedException();
+
+    public bool Active => throw new System.NotImplementedException();
+
+    public void Interact(GameObject interacter)
     {
-        if (!active)
-        {
-            Reload();
-            active = true;
-            chestUI.SetActive(true);
-        }
-        else
-        {
-            active = false;
-            chestUI.SetActive(false);
-        }
+        //if (!active)
+        //{
+        //    Reload();
+        //    active = true;
+        //    chestUI.SetActive(true);
+        //}
+        //else
+        //{
+        //    active = false;
+        //    chestUI.SetActive(false);
+        //}
     }
 
     public void Reload ()
@@ -98,5 +103,14 @@ public class Chest : Interactable
     {
 
     }
-    
+
+    public void OnInteractableEnter(IInteracter other)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void OnInteractableExit(IInteracter other)
+    {
+        throw new System.NotImplementedException();
+    }
 }

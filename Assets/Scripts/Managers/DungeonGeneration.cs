@@ -365,18 +365,21 @@ namespace DungeonGeneration
             var availability = FindAvailability(room);
             
             int roomsToAdd = rand.Next(0, availability.Count);
-            roomsToAdd = rand.Next(0, availability.Count);
-            roomsToAdd = rand.Next(0, availability.Count);
-            roomsToAdd = rand.Next(0, availability.Count);
             if (roomsToAdd > maxRooms)
                 roomsToAdd = maxRooms;
             int maxRoomNum = roomNum;
-            for (int i = 1; i <= roomsToAdd; i++)
+            CardinalDirections[] nextRooms = new CardinalDirections[roomsToAdd];
+
+            for (int i = 0; i < roomsToAdd; i++)
             {
-                //var j = rand.Next(0, i);
-                var dir = (CardinalDirections)Enum.Parse(typeof(CardinalDirections), (i - 1).ToString());
+                var j = rand.Next(0, 3);
+                nextRooms[i] = (CardinalDirections)Enum.Parse(typeof(CardinalDirections), (j).ToString());
+            }
+            
+            for (int i = 0; i < roomsToAdd; i++) 
+            {
                 // the startx and starty should be the position of the last door, offset by a certain amount in the direction ofthe axis not wall dominant.
-                maxRoomNum = BuildRoom(i + maxRoomNum, maxRooms, startX, startY, minWidth, maxWidth, minHeight, maxHeight, ref room, dir);
+                maxRoomNum = BuildRoom(i + maxRoomNum, maxRooms, startX, startY, minWidth, maxWidth, minHeight, maxHeight, ref room, nextRooms[i]);
             }
             RoomList.Add(room);
             return maxRoomNum;

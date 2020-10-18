@@ -14,7 +14,8 @@ GameObject:
   - component: {fileID: 6967207414279461817}
   - component: {fileID: 6967207414279461818}
   - component: {fileID: 6967207414279461819}
-  m_Layer: 0
+  - component: {fileID: 3039998965837368289}
+  m_Layer: 10
   m_Name: Log
   m_TagString: enemy
   m_Icon: {fileID: 0}
@@ -29,7 +30,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6967207414279461796}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7.0199385, y: 0.64825296, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -50,6 +51,7 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -139,7 +141,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.01689291, y: -0.40157628}
+  m_Offset: {x: -0.01689291, y: -0.2723484}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -150,7 +152,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.7949667, y: 0.7688918}
+  m_Size: {x: 0.7949667, y: 1.0273476}
   m_EdgeRadius: 0
 --- !u!114 &6967207414279461819
 MonoBehaviour:
@@ -164,18 +166,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28699bf9188722a4c8fdd305d0d55081, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  meleePoint: {fileID: 0}
   level: 1
+  meleePointDistanceFromPlayer: 10
   speed: 2
   currentState: 0
-  health: {fileID: 11400000, guid: 221cd7f4bb3fb4740ae148600ec20a16, type: 2}
-  healthSignal: {fileID: 0}
   attributes:
-    strength: 0
-    dexterity: 0
-    constitution: 0
-    intelligence: 0
-    wisdom: 0
-    charisma: 0
+    strength: 10
+    dexterity: 10
+    constitution: 10
+    intelligence: 10
+    wisdom: 10
+    charisma: 10
     mainModifiers:
       strength_modifier: 0
       dexterity_modifier: 0
@@ -183,7 +185,14 @@ MonoBehaviour:
       intelligence_modifier: 0
       wisdom_modifier: 0
       charisma_modifier: 0
-    additionalModifiers:
+    equipmentModifiers:
+      strength_modifier: 0
+      dexterity_modifier: 0
+      constitution_modifier: 0
+      intelligence_modifier: 0
+      wisdom_modifier: 0
+      charisma_modifier: 0
+    buffModifiers:
       strength_modifier: 0
       dexterity_modifier: 0
       constitution_modifier: 0
@@ -197,14 +206,21 @@ MonoBehaviour:
       intelligence_modifier: 0
       wisdom_modifier: 0
       charisma_modifier: 0
-  charOpen: 0
-  equipment:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  characterUI: {fileID: 0}
+  defense: 0
   enemyName: Log
-  lootTable: {fileID: 11400000, guid: a8e590b3c9fa0444d84f28732806f09c, type: 2}
+  lootTable: {fileID: 11400000, guid: 11551abac567ce149964c7b62d051c6a, type: 2}
+--- !u!114 &3039998965837368289
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6967207414279461796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13045e85143f9614580c05b9eb9ffb68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: {fileID: 11400000, guid: 9e9eecd3e7f75f84abe87f724f63cd1b, type: 2}
+  currentHealth: 0
+  healthSignal: {fileID: 0}

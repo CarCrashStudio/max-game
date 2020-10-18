@@ -109,28 +109,6 @@ public class DungeonManager : MonoBehaviour
         }
     }
 
-    public void SetCameraPos ()
-    {
-        var pos = roomManager.currentRoom.GetComponent<Room>().roomPos;
-        var size = roomManager.currentRoom.GetComponent<Room>().roomSize;
-        //Debug.Log(pos);
-        //Debug.Log(size);
-        float height = Mathf.Round(2f * mainCamera.orthographicSize / mainCamera.rect.height);
-        float width = Mathf.Round(height * mainCamera.aspect / mainCamera.rect.width);
-        //Debug.Log($"{height}, {width}");
-
-        //UnityEngine.Vector2 min = new UnityEngine.Vector2(pos.x + (size.x - Mathf.Round(width / 2)), pos.y - Mathf.Round(height / 2));
-        //UnityEngine.Vector2 max = new UnityEngine.Vector2(pos.x + Mathf.Round(width / 2), pos.y - (size.y - Mathf.Round(height / 2)));
-
-        //if (min.x < pos.x)
-        //    min.x = pos.x;
-        //if (min.y > pos.y)
-        //    min.y = pos.y;
-
-        mainCamera.GetComponent<CameraMovement>().minClamp = pos;
-        mainCamera.GetComponent<CameraMovement>().maxClamp = new UnityEngine.Vector2((pos + size).x, (-(pos + size)).y);
-        mainCamera.transform.position = new Vector3(pos.x, pos.y, -1);
-    }
     public void BuildAllRooms (List<Room<GameObject>> rooms)
     {
         this.rooms = new GameObject[rooms.Count];

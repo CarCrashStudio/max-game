@@ -4,40 +4,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Inventory : MonoBehaviour
 {
-    [SerializeField] protected Signal equipmentSignal;
-
     [SerializeField] protected int inventorySize = 6;
     [SerializeField] protected int equipmentSize = 7;
     [SerializeField] protected int maxItemStack = 16;
 
-    [SerializeField] private GameObject inventoryUI;
-    [SerializeField] private GameObject inventoryUIGrid;
-    [SerializeField] private Canvas canvas;
-
-    [SerializeField] public InventoryItem[] inventory;
-    [SerializeField] protected GameObject[] inventoryObjects;
-    [SerializeField] protected GameObject[] inventorySlots;
+    [SerializeField] protected Canvas canvas;
+    public InventoryItem[] inventory;
 
     public Equipment[] equipment;
-    [SerializeField] protected GameObject[] equipmentObjects;
-    [SerializeField] protected GameObject[] equipmentSlots;
-    private void Awake()
+
+    protected Entity entity;
+
+    public virtual void Awake()
     {
         inventory = new InventoryItem[inventorySize];
         equipment = new Equipment[equipmentSize];
 
-        inventoryObjects = new GameObject[inventorySize];
-        equipmentObjects = new GameObject[equipmentSize];
-
-        for (int i = 0; i < inventorySize; i++)
-        {
-            // instantiate a new inventory slot
-            inventorySlots[i].GetComponent<InventorySlot>().slotIndex = i;
-        }
 
         AddInventoryItem(Resources.Load<Equipment>("Items/Sword"), 1, 3);
         AddInventoryItem(Resources.Load<Equipment>("Items/Sword"), 1, 4);
@@ -47,69 +32,48 @@ public class Inventory : MonoBehaviour
         
     }
 
-    public void Update()
+    public virtual void Update()
     {
-        if (!inventoryUI.activeInHierarchy) { return; }
-
-        for (int i = 0; i < inventorySize; i++)
-        {
-            if (inventoryObjects[i] == null && (inventory[i] != null && inventory[i].item != null))
-            {
-                inventoryObjects[i] = Instantiate(Resources.Load<GameObject>("UI/Inventory Item"), inventoryUIGrid.transform.parent);
-                inventoryObjects[i].GetComponent<RectTransform>().anchoredPosition = inventorySlots[i].GetComponent<RectTransform>().anchoredPosition;
-            }
-            if (inventory[i] != null && inventory[i].item != null)
-            {
-                inventoryObjects[i].GetComponent<RectTransform>().anchoredPosition = inventorySlots[i].GetComponent<RectTransform>().anchoredPosition;
-                inventoryObjects[i].GetComponent<Image>().sprite = inventory[i].item.sprite;
-                inventoryObjects[i].transform.GetChild(0).GetComponent<Text>().text = inventory[i].quantity.ToString();
-                inventoryObjects[i].GetComponent<DraggableInventoryItem>().canvas = canvas;
-                inventoryObjects[i].GetComponent<DraggableInventoryItem>().SetInventoryItem(inventory[i]);
-                inventoryObjects[i].GetComponent<DraggableInventoryItem>().SetInventory(this);
-            }
-        }
-        for (int i = 0; i < equipmentSize; i++)
-        {
-            if(equipmentObjects[i] == null && equipment[i] != null)
-            {
-                equipmentObjects[i] = Instantiate(Resources.Load<GameObject>("UI/Equipment Item"), inventoryUIGrid.transform.parent);
-                equipmentObjects[i].GetComponent<RectTransform>().anchoredPosition = equipmentSlots[i].GetComponent<RectTransform>().anchoredPosition;
-            }
-            if (equipment[i] != null)
-            {
-                equipmentObjects[i].GetComponent<RectTransform>().anchoredPosition = equipmentSlots[i].GetComponent<RectTransform>().anchoredPosition;
-                equipmentObjects[i].GetComponent<Image>().sprite = equipment[i].sprite;
-                equipmentObjects[i].transform.GetChild(0).GetComponent<Text>().enabled = false;
-                equipmentObjects[i].GetComponent<DraggableEquipment>().canvas = canvas;
-                equipmentObjects[i].GetComponent<DraggableEquipment>().SetEquipment(equipment[i]);
-                equipmentObjects[i].GetComponent<DraggableEquipment>().SetInventory(this);
-            }
-        }
+        UpdateModifiers();
     }
 
-    public void ToggleInventory ()
+    private void UpdateModifiers ()
     {
-        inventoryUI.SetActive(!inventoryUI.activeInHierarchy);
+        // apply any modifier buffs from equipment
+        var totalAdditionalModifiers = new Modifier();
+        for (int i = 0; i < equipmentSize; i++)
+        {
+            //if (i == (int)EquipmentSlotType.MAINHAND || i == (int)EquipmentSlotType.OFFHAND || i == (int)EquipmentSlotType.POTION) { continue; }
+
+            // do not include weapons in the buffs. Weapon modifiers will get added on during attack
+            if (equipment[i] != null && equipment[i].type != EquipmentType.WEAPON)
+            {
+                // get the modifier of the equipment
+                totalAdditionalModifiers += equipment[i].modifier;
+            }
+        }
+
+        //Debug.Log(totalAdditionalModifiers.ToString());
+        entity.attributes.equipmentModifiers = totalAdditionalModifiers;
+
+        // Update the attributes of this entity
+        entity.attributes.Update();
     }
 
     public void AddEquipment (Equipment equipment)
     {
         this.equipment[(int)equipment.slot] = equipment;
-
-        if (equipmentSignal != null) { equipmentSignal.Raise(); }
     }
     public void RemoveEquipment (Equipment equipment)
     {
         this.equipment[(int)equipment.slot] = null;
-        if (equipmentSignal != null) { equipmentSignal.Raise(); }
     }
 
     public void AddInventoryItem(Item item, int quantity = 1, int slotIndex = 0)
     {
         if (inventory[slotIndex] != null)
         {
-            Debug.Log($"II: {inventory[slotIndex]}, II.I: {inventory[slotIndex].item}");
-            if (inventory[slotIndex].item != null)
+            if (inventory[slotIndex].item != null && inventory[slotIndex].item == item)
             {
                 inventory[slotIndex].quantity += quantity;
             }
@@ -118,8 +82,41 @@ public class Inventory : MonoBehaviour
         {
             inventory[slotIndex] = new InventoryItem(item, quantity, slotIndex, canvas);
         }
-        
     }
+    public void AddInventoryItem(InventoryItem inventoryItem, int slotIndex = 0)
+    {
+        if (inventory[slotIndex] != null)
+        {
+            if (inventory[slotIndex].item != null && inventory[slotIndex].item == inventoryItem.item)
+            {
+                inventory[slotIndex].quantity += inventoryItem.quantity;
+            }
+        }
+        else if (inventory[slotIndex] == null || inventory[slotIndex].item == null)
+        {
+            inventory[slotIndex] = inventoryItem;
+        }
+    }
+    public void AddInventoryItem(InventoryItem inventoryItem)
+    {
+        for (int i = 0; i < inventorySize; i++)
+        {
+            if (inventory[i] != null)
+            {
+                if (inventory[i].item != null && inventory[i].item == inventoryItem.item)
+                {
+                    inventory[i].quantity += inventoryItem.quantity;
+                    break;
+                }
+            }
+            else if (inventory[i] == null || inventory[i].item == null)
+            {
+                inventory[i] = inventoryItem;
+                break;
+            } 
+        }
+    }
+
     public void RemoveInventoryItem (Item item, int quantity, int slotIndex)
     {
         if (inventory[slotIndex] != null)
