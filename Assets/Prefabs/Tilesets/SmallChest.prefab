@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5940649324811890506}
-  - component: {fileID: 1188193752955359997}
   - component: {fileID: 7768143961397594373}
   - component: {fileID: 6806026626946814035}
   - component: {fileID: 2108226028043237102}
@@ -36,28 +35,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1188193752955359997
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4281387767692813137}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a7f321b9254889346a206650fbeb81c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  entered: 0
-  type: 0
-  inventory:
-  - item: {fileID: 0}
-    quantity: 0
-  - item: {fileID: 0}
-    quantity: 0
-  - item: {fileID: 0}
-    quantity: 0
-  chestUI: {fileID: 2035673148485643014, guid: 6875e212c387e9449bd0bef22b127f67, type: 3}
 --- !u!212 &7768143961397594373
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -73,6 +50,7 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

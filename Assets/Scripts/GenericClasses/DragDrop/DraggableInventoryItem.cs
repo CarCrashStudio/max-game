@@ -4,11 +4,18 @@ using UnityEngine.UI;
 
 public class DraggableInventoryItem : Draggable
 {
+    [SerializeField] private TooltipPopup tooltipPopup;
     [SerializeField] InventoryItem inventoryItem;
     [SerializeField] Inventory inventory;
 
     public Signal disableRaycastSignal;
     public Signal enableRaycastSignal;
+
+    public TooltipPopup TooltipPopup
+    {
+        get { return tooltipPopup; }
+        set { tooltipPopup = value; }
+    }
 
     public InventoryItem GetInventoryItem () { return inventoryItem; }
     public void SetInventoryItem (InventoryItem inventoryItem) { this.inventoryItem = inventoryItem; }
@@ -28,6 +35,19 @@ public class DraggableInventoryItem : Draggable
     {
         enableRaycastSignal.Raise();
         base.OnEndDrag(eventData);
+    }
+
+    public override void OnPointerEnter(PointerEventData eventData)
+    {
+        tooltipPopup.DisplayInfo(inventoryItem.item);
+
+        base.OnPointerEnter(eventData);
+    }
+    public override void OnPointerExit(PointerEventData eventData)
+    {
+        tooltipPopup.HideInfo();
+
+        base.OnPointerExit(eventData);
     }
 
     public void ToggleRaycast (bool toggle)

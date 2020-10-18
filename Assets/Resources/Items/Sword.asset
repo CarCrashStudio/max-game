@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Sword
   m_EditorClassIdentifier: 
   name: Sword
-  description: A Sword
+  description: A basic combat weapon
   isDiscovered: 1
+  rarity: {fileID: 11400000, guid: f437e7fa70fc0054cb1a63d41c5b92d3, type: 2}
   sprite: {fileID: 4694007364678901417, guid: c3cc19c064e1cdd448a950b86b0a9062, type: 3}
   type: 1
   slot: 4

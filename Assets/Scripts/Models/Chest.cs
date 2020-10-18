@@ -17,17 +17,7 @@ public class Chest : IInteractable
 
     public void Interact(GameObject interacter)
     {
-        //if (!active)
-        //{
-        //    Reload();
-        //    active = true;
-        //    chestUI.SetActive(true);
-        //}
-        //else
-        //{
-        //    active = false;
-        //    chestUI.SetActive(false);
-        //}
+        
     }
 
     public void Reload ()
@@ -92,23 +82,10 @@ public class Chest : IInteractable
         }
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
     public void OnInteractableEnter(IInteracter other)
     {
         throw new System.NotImplementedException();
     }
-
     public void OnInteractableExit(IInteracter other)
     {
         throw new System.NotImplementedException();

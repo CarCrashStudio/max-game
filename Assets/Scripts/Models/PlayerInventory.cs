@@ -3,6 +3,8 @@ using UnityEngine.UI;
 
 public class PlayerInventory : Inventory
 {
+    [SerializeField] private TooltipPopup tooltipPopup;
+
     [SerializeField] private GameObject inventoryUI;
     [SerializeField] private GameObject inventoryUIGrid;
 
@@ -47,6 +49,7 @@ public class PlayerInventory : Inventory
                 inventoryObjects[i].GetComponent<DraggableInventoryItem>().canvas = canvas;
                 inventoryObjects[i].GetComponent<DraggableInventoryItem>().SetInventoryItem(inventory[i]);
                 inventoryObjects[i].GetComponent<DraggableInventoryItem>().SetInventory(this);
+                inventoryObjects[i].GetComponent<DraggableInventoryItem>().TooltipPopup = tooltipPopup;
             }
         }
         for (int i = 0; i < equipmentSize; i++)
@@ -64,6 +67,7 @@ public class PlayerInventory : Inventory
                 equipmentObjects[i].GetComponent<DraggableEquipment>().canvas = canvas;
                 equipmentObjects[i].GetComponent<DraggableEquipment>().SetEquipment(equipment[i]);
                 equipmentObjects[i].GetComponent<DraggableEquipment>().SetInventory(this);
+                equipmentObjects[i].GetComponent<DraggableEquipment>().TooltipPopup = tooltipPopup;
             }
         }
     }

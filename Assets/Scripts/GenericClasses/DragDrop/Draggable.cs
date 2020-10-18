@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(RectTransform), typeof(CanvasGroup))]
-public class Draggable : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class Draggable : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] public Canvas canvas;
     protected RectTransform rectTransform;
@@ -40,5 +40,13 @@ public class Draggable : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, 
     public virtual void OnPointerDown(PointerEventData eventData)
     {
         //Debug.Log("OnPointerDown");
+    }
+
+    public virtual void OnPointerExit(PointerEventData eventData)
+    {
+    }
+
+    public virtual void OnPointerEnter(PointerEventData eventData)
+    {
     }
 }

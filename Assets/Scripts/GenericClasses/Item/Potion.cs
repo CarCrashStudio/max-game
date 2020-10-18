@@ -5,6 +5,7 @@ using UnityEngine;
 
 public enum BuffTarget { STRENGTH, DEXTERITY, CONSTITUTION, INTELLIGENCE, WISDOM, CHARISMA, HEALTH, CURRENCY }
 [Serializable]
+[CreateAssetMenu(fileName = "New Potion", menuName = "Items/Potion")]
 public class Potion : Item, IHasCooldown
 {
     [SerializeField] private int id = 0;

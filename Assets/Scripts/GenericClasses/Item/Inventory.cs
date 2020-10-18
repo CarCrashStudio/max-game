@@ -13,7 +13,6 @@ public class Inventory : MonoBehaviour
 
     [SerializeField] protected Canvas canvas;
     public InventoryItem[] inventory;
-
     public Equipment[] equipment;
 
     protected Entity entity;

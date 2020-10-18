@@ -3,11 +3,19 @@ using UnityEngine.EventSystems;
 
 public class DraggableEquipment : Draggable
 {
+    [SerializeField] private TooltipPopup tooltipPopup;
+
     [SerializeField] Equipment equipment;
     [SerializeField] Inventory inventory;
 
     public Signal disableRaycastSignal;
     public Signal enableRaycastSignal;
+
+    public TooltipPopup TooltipPopup
+    {
+        get { return tooltipPopup; }
+        set { tooltipPopup = value; }
+    }
 
     public Equipment GetEquipment() { return equipment; }
     public void SetEquipment(Equipment equipment) { this.equipment = equipment; }
@@ -27,6 +35,19 @@ public class DraggableEquipment : Draggable
     {
         enableRaycastSignal.Raise();
         base.OnEndDrag(eventData);
+    }
+
+    public override void OnPointerEnter(PointerEventData eventData)
+    {
+        tooltipPopup.DisplayInfo(equipment);
+
+        base.OnPointerEnter(eventData);
+    }
+    public override void OnPointerExit(PointerEventData eventData)
+    {
+        tooltipPopup.HideInfo();
+
+        base.OnPointerExit(eventData);
     }
 
     public void ToggleRaycast(bool toggle)
