@@ -5,6 +5,7 @@
  * Weapon proficiency bonuses would be added to Attack rolls 
  * while armor proficiencies will determine whether or not the armor affects the user negatively or not
  */
+
 public enum EntityState { WALK, ATTACK, STAGGER, IDLE, INTERACTING }
 public class Entity : MonoBehaviour
 {
@@ -20,9 +21,16 @@ public class Entity : MonoBehaviour
     public Attributes attributes;
 
     public int defense = 0;
+    public int proficiencyBonus = 2;
+
+    [SerializeField] private ArmorProficiencies[] gainedArmorProficiencies;
+    [SerializeField] private WeaponProficiencies[] gainedWeaponProficiencies;
 
     [SerializeField] protected Rigidbody2D myRigidBody => gameObject.GetComponent<Rigidbody2D>();
     [SerializeField] protected Animator animator => gameObject.GetComponent<Animator>();
+
+    public WeaponProficiencies[] GainedWeaponProficiencies => gainedWeaponProficiencies;
+    public ArmorProficiencies[] GainedArmorProficiencies => gainedArmorProficiencies;
 
     public virtual void Start()
     {

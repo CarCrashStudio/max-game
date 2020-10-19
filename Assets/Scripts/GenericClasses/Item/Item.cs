@@ -1,4 +1,5 @@
 ﻿using System;
+using Unity.IO.LowLevel.Unsafe;
 using UnityEngine;
 
 public class Item  : ScriptableObject, IHasTooltip
@@ -53,7 +54,10 @@ public class Item  : ScriptableObject, IHasTooltip
     {
         isDiscovered = true;
     }
+    public virtual void Awake()
+    {
 
+    }
     public virtual string GetTooltipInfoText()
     {
         return string.Empty;

@@ -9,22 +9,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 03cbb5cb0210cbe4f8875fe2714c14e0, type: 3}
-  m_Name: Sword
+  m_Script: {fileID: 11500000, guid: 6fdbb249320bd1d4597351415cc2cac0, type: 3}
+  m_Name: Sword 1
   m_EditorClassIdentifier: 
-  name: Sword
-  description: A basic combat weapon
-  isDiscovered: 1
-  rarity: {fileID: 11400000, guid: f437e7fa70fc0054cb1a63d41c5b92d3, type: 2}
-  sprite: {fileID: 4694007364678901417, guid: c3cc19c064e1cdd448a950b86b0a9062, type: 3}
-  type: 1
-  slot: 4
+  name: 
+  description: 
+  isDiscovered: 0
+  rarity: {fileID: 0}
+  sprite: {fileID: 0}
+  slot: 0
   modifier:
-    strength_modifier: 2
+    strength_modifier: 0
     dexterity_modifier: 0
     constitution_modifier: 0
     intelligence_modifier: 0
     wisdom_modifier: 0
     charisma_modifier: 0
+  rolledDie: 0
+  weaponProficiencySatisfied: 0
   id: 0
-  cooldownTime: 1
+  cooldownTime: 0

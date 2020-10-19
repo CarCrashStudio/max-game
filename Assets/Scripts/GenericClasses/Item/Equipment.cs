@@ -4,36 +4,24 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
+public enum WeaponProficiencies { SIMPLE_MELEE, SIMPLE_RANGED }
+public enum ArmorProficiencies { LIGHT, MEDIUM, HEAVY }
 public enum EquipmentType { ARMOR, WEAPON }
 public enum EquipmentSlotType { HEAD, TORSO, LEGS, BOOT, MAINHAND, OFFHAND, POTION }
 
-[Serializable]
-[CreateAssetMenu(fileName = "New Equipment", menuName = "Items/Equipment")]
-public class Equipment : Item, IHasCooldown
+public class Equipment : Item
 {
-    public EquipmentType type;
-    public EquipmentSlotType slot;
-    public Modifier modifier;
-    private CooldownManager cooldownManager => GameObject.FindObjectOfType<CooldownManager>();
+    [SerializeField] private EquipmentSlotType slot;
+    [SerializeField] private Modifier modifier;
+    public EquipmentSlotType Slot => slot;
+    public virtual EquipmentType Type { get; }
 
-    [SerializeField] private int id;
-    [SerializeField] private float cooldownTime;
-
-    public int ID => id;
-    public float CooldownTime => cooldownTime;
-
-    //public AttackType attackType;
-    //private IAttack attack;
-
+    public Modifier Modifier => modifier;
+    
     public override void Use()
     {
-        if (cooldownManager.IsOnCooldown(ID)) { return; }
-
         base.Use();
-
-        cooldownManager.PutOnCooldown(this);
     }
-
     public override string GetTooltipInfoText()
     {
         StringBuilder builder = new StringBuilder();

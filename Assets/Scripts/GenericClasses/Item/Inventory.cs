@@ -45,10 +45,10 @@ public class Inventory : MonoBehaviour
             //if (i == (int)EquipmentSlotType.MAINHAND || i == (int)EquipmentSlotType.OFFHAND || i == (int)EquipmentSlotType.POTION) { continue; }
 
             // do not include weapons in the buffs. Weapon modifiers will get added on during attack
-            if (equipment[i] != null && equipment[i].type != EquipmentType.WEAPON)
+            if (equipment[i] != null && equipment[i].Type != EquipmentType.WEAPON)
             {
                 // get the modifier of the equipment
-                totalAdditionalModifiers += equipment[i].modifier;
+                totalAdditionalModifiers += equipment[i].Modifier;
             }
         }
 
@@ -61,11 +61,11 @@ public class Inventory : MonoBehaviour
 
     public void AddEquipment (Equipment equipment)
     {
-        this.equipment[(int)equipment.slot] = equipment;
+        this.equipment[(int)equipment.Slot] = equipment;
     }
     public void RemoveEquipment (Equipment equipment)
     {
-        this.equipment[(int)equipment.slot] = null;
+        this.equipment[(int)equipment.Slot] = null;
     }
 
     public void AddInventoryItem(Item item, int quantity = 1, int slotIndex = 0)

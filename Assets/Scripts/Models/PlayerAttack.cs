@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
 
-public class PlayerAttack : GenericAttack
+public class PlayerAttack : MonoBehaviour
 {
-    /* TODO
-     * Weapons should identify the type of attack they are using
-     * Weapons should be given an array of the proficiencies required by the user to wield them
-     */
+    [SerializeField] Animator animator;
+    [SerializeField] GameObject meleePoint;
+    [SerializeField] float meleeRadius;
+    [SerializeField] LayerMask enemyLayers;
     [SerializeField] Inventory inventory;
     Player player;
 
@@ -18,25 +18,19 @@ public class PlayerAttack : GenericAttack
 
     public void MainHandAttack()
     {
-        if (inventory.equipment[(int)EquipmentSlotType.MAINHAND] != null && !cooldownManager.IsOnCooldown(inventory.equipment[(int)EquipmentSlotType.MAINHAND].ID))
+        if (inventory.equipment[(int)EquipmentSlotType.MAINHAND] != null && !cooldownManager.IsOnCooldown(((Weapon)inventory.equipment[(int)EquipmentSlotType.MAINHAND]).ID))
         {
-            base.Attack(player);
-
-            // apply cooldown
-            inventory.equipment[(int)EquipmentSlotType.MAINHAND].Use();
-
-            Debug.Log("Main Hand Attack!");
+            ((Weapon)inventory.equipment[(int)EquipmentSlotType.MAINHAND]).Attack(player, animator, meleePoint, meleeRadius, enemyLayers);
         }
     }
     public void OffHandAttack()
     {
-        //if (inventory.equipment[(int)EquipmentSlotType.OFFHAND] != null && !cooldownManager.IsOnCooldown(inventory.equipment[(int)EquipmentSlotType.OFFHAND].ID))
-        //{
-        //    base.Attack(player);
+    }
 
-        //    inventory.equipment[(int)EquipmentSlotType.OFFHAND].Use();
-        //    Debug.Log("Off Hand Attack!");
-        //}
-        base.RangedAttack();
+    private void OnDrawGizmosSelected()
+    {
+        if (!meleePoint) { return; }
+        Gizmos.DrawWireSphere(meleePoint.transform.position, meleeRadius);
+        Gizmos.DrawLine(meleePoint.transform.parent.position, Input.mousePosition);
     }
 }

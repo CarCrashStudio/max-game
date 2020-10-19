@@ -34,7 +34,7 @@ public class EquipmentSlot : DropArea
     // check if equipment is going to appropriate slot
     private bool SlotIsCorrect (InventoryItem inventoryItem)
     {
-        return ((Equipment)inventoryItem.item).slot == slotIndex;
+        return ((Equipment)inventoryItem.item).Slot == slotIndex;
     }
     // Add Equipment
 
