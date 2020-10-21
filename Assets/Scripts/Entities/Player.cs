@@ -15,9 +15,12 @@ public class Player : Entity, IInteracter
     public bool currentlyInInteractable = false;
     public float gold = 5f;
     public int Level => level;
-
     public IInteractable currentInteractable { get; set; }
 
+    private void Awake ()
+    {
+        GameEvents.current.onLevelUp += onLevelUp;
+    }
     public override void Start ()
     {
         base.Start();
@@ -34,7 +37,6 @@ public class Player : Entity, IInteracter
         base.Update();
     }
 
-
     public void Interact ()
     {
         if (currentInteractable == null) { return; }
@@ -43,7 +45,7 @@ public class Player : Entity, IInteracter
         currentInteractable.Interact(this.gameObject);
         //currentState = (!currentlyInInteractable) ? EntityState.IDLE : EntityState.INTERACTING;
     }
-    public void LevelUp ()
+    public void onLevelUp (Player player)
     {
         level++;
     }

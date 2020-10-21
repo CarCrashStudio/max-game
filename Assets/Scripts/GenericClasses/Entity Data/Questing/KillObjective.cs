@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 public class KillObjective : Objective
 {
-    private Player player;
-
     // enemy to target
     // enemy type tag (rat, slime, goblin)
     [SerializeField] private string enemyTag = "";
@@ -17,23 +15,32 @@ public class KillObjective : Objective
         this.enemyTag = enemyTag;
         this.killAreaCenter = killAreaCenter;
         this.killAreaRadius = killAreaRadius;
+
+        GameEvents.current.onEnemyKilled += EnemyKilled;
     }
     public void EnemyKilled (Enemy enemy)
     {
         // if kill area radius is not 0 then
-        if (killAreaRadius == 0f) { return; }
-
-        // if player is in kill area radius then
-        //if (player.gameObject.transform.position <= killAreaCenter + killAreaRadius)
-        //{
-
-        //}
-
-        // if the enemy is the target enemy then
-        if (enemy.CompareTag(enemyTag))
+        if (killAreaRadius != 0f)
         {
-            currentAmount++;
-            Evaluate();
+            // if player is in kill area radius then
+            if (Physics2D.OverlapCircle(killAreaCenter, killAreaRadius, 8))
+            {
+                if (enemy.CompareTag(enemyTag))
+                {
+                    currentAmount++;
+                    Evaluate();
+                }
+            }
+        }
+        else
+        {
+            // if the enemy is the target enemy then
+            if (enemy.CompareTag(enemyTag))
+            {
+                currentAmount++;
+                Evaluate();
+            }
         }
     }
 }

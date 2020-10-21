@@ -18,6 +18,7 @@ public class PlayerInventory : Inventory
     {
         base.Awake();
         entity = FindObjectOfType<Player>();
+        GameEvents.current.onEnemyKilled += onEnemyKilled;
 
         inventoryObjects = new GameObject[inventorySize];
         equipmentObjects = new GameObject[equipmentSize];
@@ -27,7 +28,15 @@ public class PlayerInventory : Inventory
             // instantiate a new inventory slot
             inventorySlots[i].GetComponent<InventorySlot>().slotIndex = i;
         }
+
     }
+
+    private void onEnemyKilled(Enemy enemy)
+    {
+        // give a random loot item from the enemy's loot table
+        AddInventoryItem(enemy.lootTable.GetLoot());
+    }
+
     public override void Update()
     {
         base.Update();

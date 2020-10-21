@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 3039998965837368289}
   m_Layer: 10
   m_Name: Log
-  m_TagString: enemy
+  m_TagString: log
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -207,6 +207,9 @@ MonoBehaviour:
       wisdom_modifier: 0
       charisma_modifier: 0
   defense: 0
+  proficiencyBonus: 2
+  gainedArmorProficiencies: 
+  gainedWeaponProficiencies: 
   enemyName: Log
   lootTable: {fileID: 11400000, guid: 11551abac567ce149964c7b62d051c6a, type: 2}
 --- !u!114 &3039998965837368289

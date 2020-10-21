@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections.Generic;
 
 public class QuestElement : MonoBehaviour
 {
@@ -12,8 +12,12 @@ public class QuestElement : MonoBehaviour
     public GameObject QuestInfoUI;
     public GameObject QuestLogUI;
 
+    private List<GameObject> objectiveElements;
+
     public void OpenQuestInfo (bool isQuestGiver)
     {
+        objectiveElements = new List<GameObject>();
+
         TextMeshProUGUI questNameText = QuestInfoUI.transform.GetChild(0).GetComponentInChildren<TextMeshProUGUI>();
         TextMeshProUGUI questDescriptionText = QuestInfoUI.transform.GetChild(1).GetComponentInChildren<TextMeshProUGUI>();
         Button returnButton = QuestInfoUI.transform.GetChild(4).GetComponent<Button>();
@@ -40,13 +44,41 @@ public class QuestElement : MonoBehaviour
             lootImage.sprite = quest.RewardItem.item.sprite;
         }
 
+        Transform objectiveTransform = QuestInfoUI.transform.GetChild(7).transform;
+
+        foreach (Objective objective in quest.Objectives)
+        {
+            var element = Instantiate(Resources.Load<GameObject>("UI/ObjectiveElement"), objectiveTransform);
+
+            TextMeshProUGUI text = element.GetComponentInChildren<TextMeshProUGUI>();
+
+            GameObject completedImage = element.transform.GetChild(0).GetChild(0).gameObject;
+            completedImage.SetActive(quest.Completed);
+
+            text.text = $"{objective.Description} ({objective.ObjectiveProgress})";
+
+            objectiveElements.Add(element);
+        }
+
         returnButton.onClick.RemoveAllListeners();
-        returnButton.onClick.AddListener(delegate { QuestInfoUI.SetActive(false);  QuestLogUI.SetActive(true); });
+        returnButton.onClick.AddListener(delegate { CloseQuestInfo(); });
 
         ToggleQuestInfo(true);
     }
     public void ToggleQuestInfo (bool toggle)
     {
         QuestInfoUI.SetActive(toggle);
+    }
+    public void CloseQuestInfo ()
+    {
+        QuestInfoUI.SetActive(false);
+        QuestLogUI.SetActive(true);
+
+        foreach(GameObject element in objectiveElements)
+        {
+            Destroy(element);
+        }
+
+        objectiveElements.Clear();
     }
 }

@@ -5,14 +5,9 @@ public class EnemyHealth : Health
     [SerializeField] private Signal healthSignal;
     private Enemy enemy;
 
-    private PlayerExperience playerExperience;
-    private PlayerInventory playerInventory;
-
     private void Awake()
     {
         enemy = GetComponent<Enemy>();
-        playerExperience = FindObjectOfType<PlayerExperience>();
-        playerInventory = FindObjectOfType<PlayerInventory>();
     }
 
     private void RaiseSignal()
@@ -39,12 +34,7 @@ public class EnemyHealth : Health
     {
         if (currentHealth <= 0)
         {
-            // give some exp amount to player
-            playerExperience.GiveExperience(5f);
-
-            // give a random loot item from the enemy's loot table
-            playerInventory.AddInventoryItem(enemy.lootTable.GetLoot());
-
+            GameEvents.current.EnemyKilled(enemy);
             Destroy(this.gameObject);
         }
     }

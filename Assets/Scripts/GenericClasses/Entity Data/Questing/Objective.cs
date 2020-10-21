@@ -9,6 +9,10 @@ public class Objective
     [SerializeField] protected int currentAmount;
     [SerializeField] protected int requiredAmount;
 
+    public string Description => description;
+    public bool IsCompleted => isCompleted;
+    public string ObjectiveProgress => $"{currentAmount} / {requiredAmount}";
+
     public Objective(string description, bool isCompleted, int currentAmount, int requiredAmount)
     {
         this.description = description;
@@ -25,9 +29,10 @@ public class Objective
             Complete();
         }
     }
-
     protected void Complete()
     {
         isCompleted = true;
+
+        GameEvents.current.ObjectiveCompleted(this);
     }
 }

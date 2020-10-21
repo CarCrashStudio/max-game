@@ -22,6 +22,8 @@ public class QuestGiver : NPC, IHasQuests
 
     public Signal QuestRemovedSignal => throw new System.NotImplementedException();
 
+    private void Awake () { questsAvailable = new List<Quest>(); }
+
     public override void Interact(GameObject interacter)
     {
         if (Active) { return; }
@@ -29,7 +31,8 @@ public class QuestGiver : NPC, IHasQuests
         base.active = true;
 
         elements = new List<GameObject>();
-        questsAvailable.Add(new Quest("Test Quest", "This is a Test", null, 15));
+        questsAvailable.Add(new Quest("Test Quest", "This is a Test", null, 15,
+                                       new KillObjective ("log", Vector2.zero, 0f, "Kill 1 Log", false, 0, 1)));
         foreach(Quest quest in questsAvailable)
         {
             var element = Instantiate(Resources.Load<GameObject>("UI/QuestElement"), QuestsAvailableLayout);
