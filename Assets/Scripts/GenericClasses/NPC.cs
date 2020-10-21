@@ -6,7 +6,7 @@ using UnityEngine;
 public abstract class NPC : MonoBehaviour, IInteractable
 {
     bool entered = false;
-    bool active = false;
+    protected bool active = false;
     public bool Entered => entered;
     public bool Active => active;
 

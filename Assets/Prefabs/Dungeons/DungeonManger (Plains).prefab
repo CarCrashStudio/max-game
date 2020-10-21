@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4963772047896741269}
+  - component: {fileID: 7185821691416358265}
   m_Layer: 0
   m_Name: DungeonManger (Plains)
   m_TagString: Untagged
@@ -30,3 +31,61 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7185821691416358265
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4963772047896741267}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5af87f9f3b476e44d978b1fe5d757500, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  iconSize: 1
+  dungeonSeed: 65
+  mainCamera: {fileID: 0}
+  roomManager:
+    currentRoom: {fileID: 0}
+    rooms:
+    - {fileID: 0}
+    - {fileID: 0}
+  northWall: {fileID: 9090202889114049339, guid: 03566cf319b1f59439063f72658a83fb,
+    type: 3}
+  southWall: {fileID: 8733446207787544891, guid: 19f70790ff569684fbecd96a3ca07e67,
+    type: 3}
+  eastWall: {fileID: 1904133583186874162, guid: 01919522731d33842ab9b1b283385506,
+    type: 3}
+  westWall: {fileID: 7859480941413400380, guid: df9b0bd78c3041f4d923f40511005c84,
+    type: 3}
+  northeastCorner: {fileID: 6531502455257106673, guid: e7fe3fba6a7ac6f49b3d52423a90cb31,
+    type: 3}
+  northwestCorner: {fileID: 3195841550553036765, guid: edefacf3af6f40f4b82aae65d2f91650,
+    type: 3}
+  southwestCorner: {fileID: 7601286656457702484, guid: 49a752919f0e51c45a4bd5b316714db2,
+    type: 3}
+  southeastCorner: {fileID: 9048931565298642769, guid: 0814dd0979e360f4592a54ff4908f5a6,
+    type: 3}
+  northDoor: {fileID: 8371125860452955057, guid: 8b840f78506370341b778e5529eda2e3,
+    type: 3}
+  southDoor: {fileID: 2548508223298184231, guid: 707e834d528411448bb374bd5656c363,
+    type: 3}
+  eastDoor: {fileID: 4200515904970336290, guid: f6d6f01ccf19364499676f767ea7f890,
+    type: 3}
+  westDoor: {fileID: 7602009514142547752, guid: a28c56020e96f8c49bac34e2e47f7d96,
+    type: 3}
+  floor: {fileID: 2784185468947244866, guid: b4923d8cbc2f61d40838a80f8b59878a, type: 3}
+  smallChest: {fileID: 4281387767692813137, guid: 08ef5e94c2d7b624ca72c63d83e29c56,
+    type: 3}
+  chestUI: {fileID: 0}
+  roomTemplate: {fileID: 8901416578489135761, guid: 4dacbf8040a66b24db12563539ac0b81,
+    type: 3}
+  spawnableLoot:
+  - {fileID: 11400000, guid: 0db56851a31c66241a869724ea2213cc, type: 2}
+  - {fileID: 11400000, guid: 11551abac567ce149964c7b62d051c6a, type: 2}
+  roomWidth: {x: 10, y: 10}
+  roomHeight: {x: 10, y: 10}
+  roomCount: {x: 1, y: 1}
+  chestCount: {x: 0, y: 0}
+  autoUpdate: 1
