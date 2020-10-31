@@ -258,7 +258,8 @@ namespace DungeonGeneration
         public void SaveDungeon (string directory)
         {
             // we haven't generated a dungeon so don't try to save it
-            if (rootRoom == null) { return; }
+            //if (rootRoom == null) { return; }
+            UnityEngine.Debug.Log(RoomList);
             string jsonData = JsonConvert.SerializeObject(RoomList);
 
             if (!System.IO.Directory.Exists($"{directory}")) { System.IO.Directory.CreateDirectory($"{directory}"); }

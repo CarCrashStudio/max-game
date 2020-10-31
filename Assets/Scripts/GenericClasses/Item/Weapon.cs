@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
-using System.Collections;
+using Newtonsoft.Json;
+using System;
 
-[CreateAssetMenu(fileName = "New Weapon", menuName = "Items/Equipment/Weapon")]
+[Serializable]
+[JsonObject(MemberSerialization.OptIn)]
 public class Weapon : Equipment, IHasCooldown
 {
     [SerializeField] private IAttack attack;
@@ -10,6 +12,13 @@ public class Weapon : Equipment, IHasCooldown
     [SerializeField] private WeaponProficiencies weaponProficiencySatisfied;
     [SerializeField] private int id;
     [SerializeField] private float cooldownTime;
+
+    public Weapon(string name, string description, bool isDiscovered, Rarity rarity, EquipmentSlotType slot, Modifier modifier, EquipmentType type) 
+        : base(name, description, isDiscovered, rarity, slot, modifier, type)
+    {
+
+    }
+
     private CooldownManager cooldownManager => GameObject.FindObjectOfType<CooldownManager>();
 
     public int ID => id;

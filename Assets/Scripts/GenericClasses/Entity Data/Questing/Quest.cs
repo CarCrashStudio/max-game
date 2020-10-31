@@ -1,9 +1,10 @@
-﻿using System.Linq;
+﻿using Newtonsoft.Json;
+using System.Linq;
 using UnityEngine;
 
 public class Quest
 {
-    bool completed = false;
+    private bool completed = false;
 
     [SerializeField] private string name;
     [SerializeField] private string description;
@@ -21,11 +22,12 @@ public class Quest
         this.rewardTable = rewardTable;
         this.rewardExp = rewardExp;
 
-        GameEvents.current.onObjectiveCompleted += onObjectiveCompleted;
+        GameEvents.onObjectiveCompleted += onObjectiveCompleted;
 
         if (rewardTable == null) { return; }
         rewardItem = rewardTable.GetLoot();
     }
+    [JsonConstructor]
     public Quest(string name, string description, LootTable rewardTable = null, float rewardExp = 0f, params Objective[] objectives)
     {
         this.name = name;
@@ -35,7 +37,7 @@ public class Quest
 
         this.objectives = objectives;
 
-        GameEvents.current.onObjectiveCompleted += onObjectiveCompleted;
+        GameEvents.onObjectiveCompleted += onObjectiveCompleted;
 
         if (rewardTable == null) { return; }
         rewardItem = rewardTable.GetLoot();
@@ -64,6 +66,6 @@ public class Quest
     private void Complete ()
     {
         completed = true;
-        GameEvents.current.QuestCompleted(this);
+        GameEvents.QuestCompleted(this);
     }
 }

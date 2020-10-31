@@ -1,8 +1,20 @@
 ﻿using UnityEngine;
 public class Health : MonoBehaviour
 {
+    [SerializeField] protected Signal healthSignal;
+    protected void RaiseSignal()
+    {
+        if (healthSignal != null)
+        {
+            healthSignal.Raise();
+        }
+    }
+
     [SerializeField] protected FloatValue maxHealth;
     [SerializeField] protected float currentHealth;
+
+    public FloatValue MaxHealth => maxHealth;
+    public float CurrentHealth => currentHealth;
 
     public void Start()
     {
@@ -46,5 +58,13 @@ public class Health : MonoBehaviour
     {
         currentHealth = 0;
         maxHealth.runtimeValue = currentHealth;
+    }
+
+    public void Load (float currentHealth, float maxHealth)
+    {
+        this.currentHealth = currentHealth;
+        this.maxHealth.runtimeValue = maxHealth;
+
+        RaiseSignal();
     }
 }

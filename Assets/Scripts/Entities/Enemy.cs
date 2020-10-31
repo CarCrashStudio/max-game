@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy : Entity
+public class Enemy : Entity, ICanWalk
 {
     public string enemyName;
 
@@ -11,9 +11,13 @@ public class Enemy : Entity
     private GameObject player;
     private Rigidbody2D playerRb;
 
-    //public bool returnHome;
-    //private Vector2 home;
-    //private bool isHome { get { return myRigidBody.position == home; } }
+    public bool returnHome;
+    private Vector2 startingPoint;
+    private bool isHome { get { return myRigidBody.position == startingPoint; } }
+
+    public Vector2 StartingPoint => startingPoint;
+    public float WalkRange => throw new System.NotImplementedException();
+    public float Speed => throw new System.NotImplementedException();
 
     // Start is called before the first frame update
     public override void Start()
@@ -29,5 +33,10 @@ public class Enemy : Entity
         // add player discovery/follow code
 
         base.Update();
+    }
+
+    public void Walk(ref Vector2 velocity)
+    {
+        throw new System.NotImplementedException();
     }
 }

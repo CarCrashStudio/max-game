@@ -3,18 +3,10 @@ using UnityEngine;
 
 public class PlayerExperience : Experience
 {
-    [SerializeField] private Signal experienceSignal;
     void Awake ()
     {
-        GameEvents.current.onEnemyKilled += OnEnemyKilled;
-        GameEvents.current.onQuestCompleted += OnQuestCompleted;
-    }
-    private void RaiseSignal()
-    {
-        if (experienceSignal != null)
-        {
-            experienceSignal.Raise();
-        }
+        GameEvents.onEnemyKilled += OnEnemyKilled;
+        GameEvents.onQuestCompleted += OnQuestCompleted;
     }
 
     public override void GiveExperience(float amt)
@@ -23,10 +15,11 @@ public class PlayerExperience : Experience
         
         if (currentExp.runtimeValue >= maxExp.runtimeValue)
         {
-            GameEvents.current.LevelUp(FindObjectOfType<Player>());
+            GameEvents.LevelUp(FindObjectOfType<Player>());
             maxExp.runtimeValue = Mathf.Pow(FindObjectOfType<Player>().Level, levelLength) * maxExp.initialValue;
         }
         RaiseSignal();
+        GameEvents.ChangesMade();
     }
 
     private void OnEnemyKilled (Enemy Enemy)

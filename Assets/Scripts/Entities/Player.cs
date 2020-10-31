@@ -1,32 +1,41 @@
-﻿// Attribute Script
-// Author: Trey Hall
-// Description:
-// Handles getting and modifying attributes related to the player such as health, mana, and other rpg attributes.
-
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 
 public class Player : Entity, IInteracter
 {
     public DungeonManager manager;
     public bool currentlyInInteractable = false;
     public float gold = 5f;
-    public int Level => level;
+    public bool gameIsPaused = false;
+    public byte Level { get => level; set => level = value; }
     public IInteractable currentInteractable { get; set; }
+    [SerializeField] private GameObject interactableNotification;
 
     private void Awake ()
     {
-        GameEvents.current.onLevelUp += onLevelUp;
+        GameEvents.onLevelUp += onLevelUp;
+        GameEvents.onInteractableEnter += OnInteractableEnter;
+        GameEvents.onInteractableExit += OnInteractableExit;
+        GameEvents.onPause += GameEvents_onPause;
+        GameEvents.onResume += GameEvents_onResume;
     }
+
+    private void GameEvents_onResume()
+    {
+        gameIsPaused = false;
+    }
+    private void GameEvents_onPause()
+    {
+        gameIsPaused = true;
+    }
+
     public override void Start ()
     {
         base.Start();
     }
     public override void Update()
     {
+        if (gameIsPaused) { return; }
+
         #region MOVEMENT
         Vector2 velocity = Vector2.zero;
         velocity.x = Input.GetAxisRaw("Horizontal");
@@ -48,5 +57,14 @@ public class Player : Entity, IInteracter
     public void onLevelUp (Player player)
     {
         level++;
+        GameEvents.ChangesMade();
+    }
+    private void OnInteractableEnter (Player player)
+    {
+        interactableNotification.SetActive(true);
+    }
+    private void OnInteractableExit(Player player)
+    {
+        interactableNotification.SetActive(false);
     }
 }

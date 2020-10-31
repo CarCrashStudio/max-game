@@ -1,11 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Newtonsoft.Json;
 
 [CreateAssetMenu()]
-public class Rarity : ScriptableObject
+[JsonObject(MemberSerialization.OptIn)]
+public class Rarity
 {
-    [SerializeField] private new string name;
-    [SerializeField] private Color textColour;
+    [SerializeField] [JsonProperty] private string name;
+    [SerializeField] [JsonProperty] private Color textColour;
 
     public string Name { get { return name; } }
     public Color TextColour { get { return textColour; } }

@@ -1,20 +1,33 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public enum BuffTarget { STRENGTH, DEXTERITY, CONSTITUTION, INTELLIGENCE, WISDOM, CHARISMA, HEALTH, CURRENCY }
 [Serializable]
-[CreateAssetMenu(fileName = "New Potion", menuName = "Items/Potion")]
+[JsonObject(MemberSerialization.OptIn)]
 public class Potion : Item, IHasCooldown
 {
-    [SerializeField] private int id = 0;
-    [SerializeField] private float cooldownTime = 30;
-    [SerializeField] private bool isDrinkable;
-    [SerializeField] private bool isThrowable;
-    [SerializeField] private BuffTarget buffTarget;
-    [SerializeField] private int buffAmount;
-    [SerializeField] private float throwRadius;
+    [JsonProperty] [SerializeField] private int id = 0;
+    [JsonProperty] [SerializeField] private float cooldownTime = 30;
+    [JsonProperty] [SerializeField] private bool isDrinkable;
+    [JsonProperty] [SerializeField] private bool isThrowable;
+    [JsonProperty] [SerializeField] private BuffTarget buffTarget;
+    [JsonProperty] [SerializeField] private int buffAmount;
+    [JsonProperty] [SerializeField] private float throwRadius;
+
+    [JsonConstructor]
+    public Potion(int id, string name, string description, bool isDiscovered, Rarity rarity, float cooldownTime, bool isDrinkable, bool isThrowable, BuffTarget buffTarget, int buffAmount, float throwRadius) : base(name, description, isDiscovered, rarity)
+    {
+        this.id = id;
+        this.cooldownTime = cooldownTime;
+        this.isDrinkable = isDrinkable;
+        this.isThrowable = isThrowable;
+        this.buffTarget = buffTarget;
+        this.buffAmount = buffAmount;
+        this.throwRadius = throwRadius;
+    }
 
     private CooldownManager cooldownManager => GameObject.FindObjectOfType<CooldownManager>();
 

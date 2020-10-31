@@ -22,7 +22,11 @@ public class QuestGiver : NPC, IHasQuests
 
     public Signal QuestRemovedSignal => throw new System.NotImplementedException();
 
-    private void Awake () { questsAvailable = new List<Quest>(); }
+    public override void Awake()
+    {
+        base.Awake();
+        questsAvailable = new List<Quest>();
+    }
 
     public override void Interact(GameObject interacter)
     {

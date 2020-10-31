@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using UnityEngine;
 
 [Serializable]
@@ -9,6 +10,7 @@ public class InventoryItem
 
     public int previousSlotIndex;
 
+    [JsonConstructor]
     public InventoryItem(Item item, int quantity)
     {
         this.item = item;

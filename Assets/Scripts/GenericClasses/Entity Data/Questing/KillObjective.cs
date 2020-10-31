@@ -16,7 +16,7 @@ public class KillObjective : Objective
         this.killAreaCenter = killAreaCenter;
         this.killAreaRadius = killAreaRadius;
 
-        GameEvents.current.onEnemyKilled += EnemyKilled;
+        GameEvents.onEnemyKilled += EnemyKilled;
     }
     public void EnemyKilled (Enemy enemy)
     {

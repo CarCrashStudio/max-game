@@ -1,16 +1,28 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using Unity.IO.LowLevel.Unsafe;
 using UnityEngine;
 
-public class Item  : ScriptableObject, IHasTooltip
+[Serializable]
+[JsonObject(MemberSerialization.OptIn)]
+public class Item  : IHasTooltip
 {
-    [SerializeField] private new string name;
-    [SerializeField] private string description;
-    [SerializeField] private bool isDiscovered;
+    [SerializeField] [JsonProperty] private string name;
+    [SerializeField] [JsonProperty] private string description;
+    [SerializeField] [JsonProperty] private bool isDiscovered;
 
-    [SerializeField] private Rarity rarity;
+    [SerializeField] [JsonProperty] private Rarity rarity;
 
     public Sprite sprite;
+
+    [JsonConstructor]
+    public Item (string name, string description, bool isDiscovered, Rarity rarity)
+    {
+        this.name = name;
+        this.description = description;
+        this.isDiscovered = isDiscovered;
+        this.rarity = rarity;
+    }
 
     public virtual void Use()
     {

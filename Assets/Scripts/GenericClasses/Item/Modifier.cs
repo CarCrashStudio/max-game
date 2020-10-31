@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -7,14 +8,15 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 [Serializable]
+[JsonObject(MemberSerialization.OptIn)]
 public class Modifier
 {
-    [UnityEngine.SerializeField] private int strength_modifier = 0;
-    [UnityEngine.SerializeField] private int dexterity_modifier = 0;
-    [UnityEngine.SerializeField] private int constitution_modifier = 0;
-    [UnityEngine.SerializeField] private int intelligence_modifier = 0;
-    [UnityEngine.SerializeField] private int wisdom_modifier = 0;
-    [UnityEngine.SerializeField] private int charisma_modifier = 0;
+    [UnityEngine.SerializeField] [JsonProperty] private int strength_modifier = 0;
+    [UnityEngine.SerializeField] [JsonProperty] private int dexterity_modifier = 0;
+    [UnityEngine.SerializeField] [JsonProperty] private int constitution_modifier = 0;
+    [UnityEngine.SerializeField] [JsonProperty] private int intelligence_modifier = 0;
+    [UnityEngine.SerializeField] [JsonProperty] private int wisdom_modifier = 0;
+    [UnityEngine.SerializeField] [JsonProperty] private int charisma_modifier = 0;
 
     public int Strength { get { return strength_modifier; } }
     public int Dexterity { get { return dexterity_modifier; } }
@@ -23,14 +25,15 @@ public class Modifier
     public int Wisdom { get { return wisdom_modifier; } }
     public int Charisma { get { return charisma_modifier; } }
 
-    public Modifier (int strength = 0, int dexterity = 0, int constituiton = 0, int intelligence = 0, int wisdom = 0, int charisma = 0)
+    [JsonConstructor]
+    public Modifier (int strength_modifier = 0, int dexterity_modifier = 0, int constituiton_modifier = 0, int intelligence_modifier = 0, int wisdom_modifier = 0, int charisma_modifier = 0)
     {
-        strength_modifier = strength;
-        dexterity_modifier = dexterity;
-        constitution_modifier = constituiton;
-        intelligence_modifier = intelligence;
-        wisdom_modifier = wisdom;
-        charisma_modifier = charisma;
+        this.strength_modifier = strength_modifier;
+        this.dexterity_modifier = dexterity_modifier;
+        this.constitution_modifier = constituiton_modifier;
+        this.intelligence_modifier = intelligence_modifier;
+        this.wisdom_modifier = wisdom_modifier;
+        this.charisma_modifier = charisma_modifier;
     }
 
     public void SetStrength (int strength)
@@ -66,6 +69,9 @@ public class Modifier
         temp.SetWisdom(left.Wisdom + right.Wisdom);
         temp.SetIntelligence(left.Intelligence + right.Intelligence);
         temp.SetCharisma(left.Charisma + right.Charisma);
+
+        //GameEvents.ChangesMade();
+
         return temp;
     }
     public static Modifier operator -(Modifier left, Modifier right)
@@ -77,11 +83,15 @@ public class Modifier
         temp.SetWisdom(left.Wisdom - right.Wisdom);
         temp.SetIntelligence(left.Intelligence - right.Intelligence);
         temp.SetCharisma(left.Charisma - right.Charisma);
+
+        //GameEvents.ChangesMade();
+
         return temp;
     }
 
     public override string ToString()
     {
-        return $"Strength: {strength_modifier}\nDexterity: {dexterity_modifier}\nConstitution: {constitution_modifier}\nWisdom: {wisdom_modifier}\nIntelligence: {intelligence_modifier}\nCharisma: {charisma_modifier}\n";
+        return base.ToString();
+        //return $"Strength: {strength_modifier}\nDexterity: {dexterity_modifier}\nConstitution: {constitution_modifier}\nWisdom: {wisdom_modifier}\nIntelligence: {intelligence_modifier}\nCharisma: {charisma_modifier}\n";
     }
 }

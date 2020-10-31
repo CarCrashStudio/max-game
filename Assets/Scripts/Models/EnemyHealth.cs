@@ -34,7 +34,7 @@ public class EnemyHealth : Health
     {
         if (currentHealth <= 0)
         {
-            GameEvents.current.EnemyKilled(enemy);
+            GameEvents.EnemyKilled(enemy);
             Destroy(this.gameObject);
         }
     }

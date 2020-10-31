@@ -33,6 +33,6 @@ public class Objective
     {
         isCompleted = true;
 
-        GameEvents.current.ObjectiveCompleted(this);
+        GameEvents.ObjectiveCompleted(this);
     }
 }

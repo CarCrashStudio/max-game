@@ -58,6 +58,11 @@ public class DungeonManager : MonoBehaviour
 
     private List<Room<GameObject>> roomsInDungeon;
 
+    private void Awake()
+    {
+        generation = new DungeonGeneration<GameObject>(northWall, southWall, eastWall, westWall, northwestCorner, northeastCorner, southwestCorner, southeastCorner, northDoor, southDoor, eastDoor, westDoor, floor, smallChest, dungeonSeed);
+        GenerateMap();
+    }
     private void Start()
     {
         roomManager.Start();
@@ -93,8 +98,8 @@ public class DungeonManager : MonoBehaviour
             if (chestCount.x > chestCount.y)
                 chestCount.y = chestCount.x;
 
-            generation = new DungeonGeneration<GameObject>(northWall, southWall, eastWall, westWall, northwestCorner, northeastCorner, southwestCorner, southeastCorner, northDoor, southDoor, eastDoor, westDoor, floor, smallChest, dungeonSeed);
-
+            // Needed for Unity Editor Script
+            if (generation == null) { generation = new DungeonGeneration<GameObject>(northWall, southWall, eastWall, westWall, northwestCorner, northeastCorner, southwestCorner, southeastCorner, northDoor, southDoor, eastDoor, westDoor, floor, smallChest, dungeonSeed); }
             roomsInDungeon = generation.BuildDungeon(origin: new DungeonGeneration.Vector2(0, 0), 
                                                      width:  new DungeonGeneration.Vector2(roomWidth.x, roomWidth.y), 
                                                      height: new DungeonGeneration.Vector2(roomHeight.x, roomHeight.y), 
@@ -279,6 +284,8 @@ public class DungeonManager : MonoBehaviour
     }
     public void Load()
     {
+        DestroyMap();
+
         roomManager = new RoomManager();
         if (player == null) { player = FindObjectOfType<Player>(); }
         player.manager = this;

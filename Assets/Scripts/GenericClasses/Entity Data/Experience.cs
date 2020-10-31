@@ -7,11 +7,26 @@ using UnityEngine;
 
 public class Experience : MonoBehaviour
 {
+    // TODO: MOVE LEVEL INTO EXPERIENCE
+
     [SerializeField] protected float levelLength = 2f;
     [SerializeField] protected float levelDifficulty = 5f;
 
     [SerializeField] protected FloatValue maxExp;
     [SerializeField] protected FloatValue currentExp;
+
+    [SerializeField] protected Signal experienceSignal;
+    protected void RaiseSignal()
+    {
+        if (experienceSignal != null)
+        {
+            experienceSignal.Raise();
+        }
+    }
+
+    public FloatValue MaxExp => maxExp;
+    public FloatValue CurrentExp => currentExp;
+
     public void Start()
     {
         currentExp.runtimeValue = 0;
@@ -35,5 +50,11 @@ public class Experience : MonoBehaviour
     public virtual void FullExperience()
     {
         currentExp.runtimeValue = maxExp.runtimeValue;
+    }
+
+    public void Load(float currentExp, float maxExp)
+    {
+        this.currentExp.runtimeValue = currentExp;
+        this.maxExp.runtimeValue = maxExp;
     }
 }

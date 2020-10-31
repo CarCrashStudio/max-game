@@ -1,20 +1,21 @@
-﻿using System;
-using UnityEditor;
+﻿using Newtonsoft.Json;
+using System;
 using UnityEngine;
 
-[System.Serializable]
+[Serializable]
+[JsonObject(MemberSerialization.OptIn)]
 public class Attributes
 {
-    [SerializeField] protected int strength;
-    [SerializeField] protected int dexterity;
-    [SerializeField] protected int constitution;
-    [SerializeField] protected int intelligence;
-    [SerializeField] protected int wisdom;
-    [SerializeField] protected int charisma;
+    [SerializeField] [JsonProperty] protected int strength;
+    [SerializeField] [JsonProperty] protected int dexterity;
+    [SerializeField] [JsonProperty] protected int constitution;
+    [SerializeField] [JsonProperty] protected int intelligence;
+    [SerializeField] [JsonProperty] protected int wisdom;
+    [SerializeField] [JsonProperty] protected int charisma;
 
     public Modifier mainModifiers;
-    public Modifier equipmentModifiers;
-    public Modifier buffModifiers;
+    [JsonProperty] public Modifier equipmentModifiers;
+    [JsonProperty] public Modifier buffModifiers;
     public Modifier totalModifiers;
 
     public void Start()
@@ -30,6 +31,8 @@ public class Attributes
     }
     public void Update()
     {
+        if (mainModifiers == null) { return; }
+
         mainModifiers.SetStrength((strength - 10) / 2);
         mainModifiers.SetDexterity((dexterity - 10) / 2);
         mainModifiers.SetConstitution((constitution - 10) / 2);
@@ -40,29 +43,60 @@ public class Attributes
         totalModifiers = mainModifiers + equipmentModifiers + buffModifiers;
     }
 
+    public void SetStrength (int amt)
+    {
+        strength = amt;
+    }
+    public void SetDexterity(int amt)
+    {
+        dexterity = amt;
+    }
+    public void SetConstitution(int amt)
+    {
+        constitution = amt;
+    }
+    public void SetIntelligences(int amt)
+    {
+        intelligence = amt;
+    }
+    public void SetWisdom(int amt)
+    {
+        wisdom = amt;
+    }
+    public void SetCharisma(int amt)
+    {
+        charisma = amt;
+    }
+
     public void IncreaseStrength (int amt)
     {
         strength += amt;
+        GameEvents.ChangesMade();
     }
     public void IncreaseDexterity(int amt)
     {
         dexterity += amt;
+        GameEvents.ChangesMade();
     }
     public void IncreaseConstitution(int amt)
     {
         constitution += amt;
+        GameEvents.ChangesMade();
     }
     public void IncreaseIntelligence(int amt)
     {
         intelligence += amt;
+        GameEvents.ChangesMade();
     }
     public void IncreaseWisdom  (int amt)
     {
         wisdom += amt;
+        GameEvents.ChangesMade();
     }
     public void IncreaseCharisma(int amt)
     {
         charisma += amt;
+        GameEvents.ChangesMade();
     }
 
     public void DecreaseStrength(int amt)
@@ -70,36 +104,42 @@ public class Attributes
         strength -= amt;
         if (strength < 1)
             strength = 1;
+        GameEvents.ChangesMade();
     }
     public void DecreaseDexterity(int amt)
     {
         dexterity -= amt;
         if (dexterity < 1)
             dexterity = 1;
+        GameEvents.ChangesMade();
     }
     public void DecreaseConstitution(int amt)
     {
         constitution -= amt;
         if (constitution < 1)
             constitution = 1;
+        GameEvents.ChangesMade();
     }
     public void DecreaseIntelligence(int amt)
     {
         intelligence -= amt;
         if (intelligence < 1)
             intelligence = 1;
+        GameEvents.ChangesMade();
     }
     public void DecreaseWisdom(int amt)
     {
         wisdom -= amt;
         if (wisdom < 1)
             wisdom = 1;
+        GameEvents.ChangesMade();
     }
     public void DecreaseCharisma(int amt)
     {
         charisma -= amt;
         if (charisma < 1)
             charisma = 1;
+        GameEvents.ChangesMade();
     }
 
     public override string ToString()

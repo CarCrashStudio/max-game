@@ -3,6 +3,7 @@ using UnityEngine.UI;
 
 public class PlayerInventory : Inventory
 {
+    bool gameIsPaused = false;
     [SerializeField] private TooltipPopup tooltipPopup;
 
     [SerializeField] private GameObject inventoryUI;
@@ -18,7 +19,9 @@ public class PlayerInventory : Inventory
     {
         base.Awake();
         entity = FindObjectOfType<Player>();
-        GameEvents.current.onEnemyKilled += onEnemyKilled;
+        GameEvents.onEnemyKilled += onEnemyKilled;
+        GameEvents.onPause += onPause;
+        GameEvents.onResume += onResume;
 
         inventoryObjects = new GameObject[inventorySize];
         equipmentObjects = new GameObject[equipmentSize];
@@ -28,13 +31,21 @@ public class PlayerInventory : Inventory
             // instantiate a new inventory slot
             inventorySlots[i].GetComponent<InventorySlot>().slotIndex = i;
         }
-
     }
 
     private void onEnemyKilled(Enemy enemy)
     {
         // give a random loot item from the enemy's loot table
         AddInventoryItem(enemy.lootTable.GetLoot());
+    }
+    private void onPause ()
+    {
+        gameIsPaused = true;
+        inventoryUI.SetActive(false);
+    }
+    private void onResume()
+    {
+        gameIsPaused = false;
     }
 
     public override void Update()
@@ -80,9 +91,9 @@ public class PlayerInventory : Inventory
             }
         }
     }
-
     public void ToggleInventory()
     {
+        if (gameIsPaused) return;
         inventoryUI.SetActive(!inventoryUI.activeInHierarchy);
     }
 }

@@ -23,8 +23,7 @@ public class Inventory : MonoBehaviour
         equipment = new Equipment[equipmentSize];
 
 
-        AddInventoryItem(Resources.Load<Equipment>("Items/Sword"), 1, 3);
-        AddInventoryItem(Resources.Load<Equipment>("Items/Sword"), 1, 4);
+        AddInventoryItem(GameManager.Items.Find("Sword"), 1, 3);
     }
     private void Start()
     {
@@ -62,10 +61,12 @@ public class Inventory : MonoBehaviour
     public void AddEquipment (Equipment equipment)
     {
         this.equipment[(int)equipment.Slot] = equipment;
+        GameEvents.ChangesMade();
     }
     public void RemoveEquipment (Equipment equipment)
     {
         this.equipment[(int)equipment.Slot] = null;
+        GameEvents.ChangesMade();
     }
 
     public void AddInventoryItem(Item item, int quantity = 1, int slotIndex = 0)
@@ -81,6 +82,7 @@ public class Inventory : MonoBehaviour
         {
             inventory[slotIndex] = new InventoryItem(item, quantity, slotIndex, canvas);
         }
+        GameEvents.ChangesMade();
     }
     public void AddInventoryItem(InventoryItem inventoryItem, int slotIndex = 0)
     {
@@ -95,6 +97,7 @@ public class Inventory : MonoBehaviour
         {
             inventory[slotIndex] = inventoryItem;
         }
+        GameEvents.ChangesMade();
     }
     public void AddInventoryItem(InventoryItem inventoryItem)
     {
@@ -114,6 +117,7 @@ public class Inventory : MonoBehaviour
                 break;
             } 
         }
+        GameEvents.ChangesMade();
     }
 
     public void RemoveInventoryItem (Item item, int quantity, int slotIndex)
@@ -122,5 +126,6 @@ public class Inventory : MonoBehaviour
         {
             inventory[slotIndex] = null;
         }
+        GameEvents.ChangesMade();
     }
 }
