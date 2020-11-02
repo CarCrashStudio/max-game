@@ -23,7 +23,9 @@ public class Inventory : MonoBehaviour
         equipment = new Equipment[equipmentSize];
 
 
-        AddInventoryItem(GameManager.Items.Find("Sword"), 1, 3);
+        AddInventoryItem(GameManager.Items.Db[0], 1, 0);
+        AddInventoryItem(GameManager.Items.Db[1], 1, 1);
+        AddInventoryItem(GameManager.Items.Db[2], 1, 2);
     }
     private void Start()
     {

@@ -1,27 +1,46 @@
-﻿using Newtonsoft.Json;
+﻿using JsonKnownTypes;
+using Newtonsoft.Json;
 using System;
+using System.Linq;
 using Unity.IO.LowLevel.Unsafe;
 using UnityEngine;
 
 [Serializable]
 [JsonObject(MemberSerialization.OptIn)]
+[JsonConverter(typeof(JsonKnownTypesConverter<Item>))]
+[JsonKnownType(typeof(Item), "item")]
+//[JsonKnownType(typeof(Equipment), "equipment")]
+[JsonKnownType(typeof(Weapon), "weapon")]
+[JsonKnownType(typeof(Armor), "armor")]
+[JsonKnownType(typeof(Potion), "potion")]
 public class Item  : IHasTooltip
 {
+    [JsonProperty] [SerializeField] protected int id = 0;
     [SerializeField] [JsonProperty] private string name;
     [SerializeField] [JsonProperty] private string description;
     [SerializeField] [JsonProperty] private bool isDiscovered;
 
-    [SerializeField] [JsonProperty] private Rarity rarity;
+    [JsonProperty] private string rarityName;
+    [SerializeField] private Rarity rarity;
 
     public Sprite sprite;
 
-    [JsonConstructor]
-    public Item (string name, string description, bool isDiscovered, Rarity rarity)
+    public Item (int id, string name, string description, bool isDiscovered, Rarity rarity)
     {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.isDiscovered = isDiscovered;
         this.rarity = rarity;
+    }
+    [JsonConstructor]
+    public Item(int id, string name, string description, bool isDiscovered, string rarityName)
+    {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.isDiscovered = isDiscovered;
+        this.rarity = GameManager.Rarities.Db.Where(r => r.Name == rarityName).FirstOrDefault();
     }
 
     public virtual void Use()

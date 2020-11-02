@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using Newtonsoft.Json;
 using System;
+using Newtonsoft.Json.Converters;
 
 [Serializable]
 [JsonObject(MemberSerialization.OptIn)]
@@ -8,13 +9,20 @@ public class Weapon : Equipment, IHasCooldown
 {
     [SerializeField] private IAttack attack;
 
+    [JsonConverter(typeof(StringEnumConverter))]
     [SerializeField] private Die rolledDie;
+    [JsonConverter(typeof(StringEnumConverter))]
     [SerializeField] private WeaponProficiencies weaponProficiencySatisfied;
-    [SerializeField] private int id;
-    [SerializeField] private float cooldownTime;
+    [JsonProperty] [SerializeField] private float cooldownTime;
 
-    public Weapon(string name, string description, bool isDiscovered, Rarity rarity, EquipmentSlotType slot, Modifier modifier, EquipmentType type) 
-        : base(name, description, isDiscovered, rarity, slot, modifier, type)
+    public Weapon(int id, string name, string description, bool isDiscovered, Rarity rarity, EquipmentSlotType slot, Modifier modifier, EquipmentType type) 
+        : base(id, name, description, isDiscovered, rarity, slot, modifier, type)
+    {
+
+    }
+    [JsonConstructor]
+    public Weapon(int id, string name, string description, bool isDiscovered, string rarityName, EquipmentSlotType slot, Modifier modifier, EquipmentType type)
+        : base(id, name, description, isDiscovered, rarityName, slot, modifier, type)
     {
 
     }

@@ -818,24 +818,6 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-  - primaryKey: 27
-    secondaryKey: 0
-    teritiaryKey: 0
-    action:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 0}
-          m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-          m_MethodName: Pause
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 1
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
 --- !u!114 &1242429776
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -907,6 +889,7 @@ MonoBehaviour:
   manager: {fileID: 0}
   currentlyInInteractable: 0
   gold: 5
+  gameIsPaused: 0
   interactableNotification: {fileID: 6682940714354465984}
 --- !u!114 &4656626090294991972
 MonoBehaviour:
@@ -942,7 +925,6 @@ MonoBehaviour:
   maxItemStack: 16
   canvas: {fileID: 3597713296462263334}
   inventory: []
-  equipment: []
   tooltipPopup: {fileID: 1984317954833694597}
   inventoryUI: {fileID: 2272920347756193765}
   inventoryUIGrid: {fileID: 7189316062417774191}
@@ -1024,9 +1006,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b01a5ae47aee6643862db47eee9c9e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  healthSignal: {fileID: 11400000, guid: 78aff940d266cb944a6690fd8c3cda08, type: 2}
   maxHealth: {fileID: 11400000, guid: d2114ee658b755b4cada4eb06e566c05, type: 2}
   currentHealth: 0
-  healthSignal: {fileID: 11400000, guid: 78aff940d266cb944a6690fd8c3cda08, type: 2}
 --- !u!114 &4943318084430512835
 MonoBehaviour:
   m_ObjectHideFlags: 0

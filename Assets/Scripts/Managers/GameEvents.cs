@@ -24,6 +24,7 @@ public class GameEvents : MonoBehaviour
     // Game Events
     public static event Action onChangesMade;
     public static event Action onMainMenuGameLoad;
+    public static event Action onMainMenuGameNew;
     public static event Action onPause;
     public static event Action onResume;
 
@@ -35,6 +36,7 @@ public class GameEvents : MonoBehaviour
     public static void InteractableExit(Player player) => onInteractableExit?.Invoke(player);
     public static void ChangesMade() => onChangesMade?.Invoke();
     public static void MainMenuGameLoad() => onMainMenuGameLoad?.Invoke();
+    public static void MainMenuGameNew() => onMainMenuGameNew?.Invoke();
     public static void Pause() => onPause?.Invoke();
     public static void Resume() => onResume?.Invoke();
 }

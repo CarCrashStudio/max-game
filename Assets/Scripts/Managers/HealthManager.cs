@@ -8,7 +8,22 @@ public class HealthManager : MonoBehaviour
     [SerializeField] private ProgressBar healthBar;
     [SerializeField] private FloatValue playerCurrentHealth;
     [SerializeField] private Text playerCurrentHealthText;
-    // Start is called before the first frame update
+    void Awake()
+    {
+        GameEvents.onPause += GameEvents_onPause;
+        GameEvents.onResume += GameEvents_onResume;
+    }
+
+    private void GameEvents_onResume()
+    {
+        gameObject.SetActive(true);
+    }
+
+    private void GameEvents_onPause()
+    {
+        gameObject.SetActive(false);
+    }
+
     private void Start()
     {
         playerCurrentHealth.runtimeValue = playerCurrentHealth.initialValue;

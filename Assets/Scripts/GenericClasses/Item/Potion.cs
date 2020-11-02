@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 public enum BuffTarget { STRENGTH, DEXTERITY, CONSTITUTION, INTELLIGENCE, WISDOM, CHARISMA, HEALTH, CURRENCY }
@@ -9,18 +11,26 @@ public enum BuffTarget { STRENGTH, DEXTERITY, CONSTITUTION, INTELLIGENCE, WISDOM
 [JsonObject(MemberSerialization.OptIn)]
 public class Potion : Item, IHasCooldown
 {
-    [JsonProperty] [SerializeField] private int id = 0;
     [JsonProperty] [SerializeField] private float cooldownTime = 30;
     [JsonProperty] [SerializeField] private bool isDrinkable;
     [JsonProperty] [SerializeField] private bool isThrowable;
+    [JsonConverter(typeof(StringEnumConverter))]
     [JsonProperty] [SerializeField] private BuffTarget buffTarget;
     [JsonProperty] [SerializeField] private int buffAmount;
     [JsonProperty] [SerializeField] private float throwRadius;
 
-    [JsonConstructor]
-    public Potion(int id, string name, string description, bool isDiscovered, Rarity rarity, float cooldownTime, bool isDrinkable, bool isThrowable, BuffTarget buffTarget, int buffAmount, float throwRadius) : base(name, description, isDiscovered, rarity)
+    public Potion(int id, string name, string description, bool isDiscovered, Rarity rarity, float cooldownTime, bool isDrinkable, bool isThrowable, BuffTarget buffTarget, int buffAmount, float throwRadius) : base(id, name, description, isDiscovered, rarity)
     {
-        this.id = id;
+        this.cooldownTime = cooldownTime;
+        this.isDrinkable = isDrinkable;
+        this.isThrowable = isThrowable;
+        this.buffTarget = buffTarget;
+        this.buffAmount = buffAmount;
+        this.throwRadius = throwRadius;
+    }
+    [JsonConstructor]
+    public Potion(int id, string name, string description, bool isDiscovered, string rarityName, float cooldownTime, bool isDrinkable, bool isThrowable, BuffTarget buffTarget, int buffAmount, float throwRadius) : base(id, name, description, isDiscovered, rarityName)
+    {
         this.cooldownTime = cooldownTime;
         this.isDrinkable = isDrinkable;
         this.isThrowable = isThrowable;
@@ -83,5 +93,15 @@ public class Potion : Item, IHasCooldown
                 ((Entity)target).attributes.buffModifiers.SetCharisma(buffAmount + cha);
                 break;
         }
+    }
+
+    public override string GetTooltipInfoText()
+    {
+        StringBuilder builder = new StringBuilder();
+        builder.Append("<size=35>").Append(ColouredName).Append("</size>").AppendLine();
+        builder.Append(Rarity.Name).AppendLine();
+        builder.Append(Description).AppendLine();
+
+        return builder.ToString();
     }
 }

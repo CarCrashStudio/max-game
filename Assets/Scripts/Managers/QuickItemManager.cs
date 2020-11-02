@@ -5,6 +5,23 @@ public class QuickItemManager : MonoBehaviour
 {
     [SerializeField] private Inventory inventory;
     [SerializeField] private GameObject quickItems;
+
+    void Awake ()
+    {
+        GameEvents.onPause += GameEvents_onPause;
+        GameEvents.onResume += GameEvents_onResume;
+    }
+
+    private void GameEvents_onResume()
+    {
+        quickItems.SetActive(true);
+    }
+
+    private void GameEvents_onPause()
+    {
+        quickItems.SetActive(false);
+    }
+
     public void Update()
     {
         if (inventory.equipment[(int)EquipmentSlotType.MAINHAND] != null)

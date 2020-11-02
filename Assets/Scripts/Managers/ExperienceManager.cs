@@ -8,7 +8,22 @@ public class ExperienceManager : MonoBehaviour
     [SerializeField] private FloatValue playerCurrentExp;
     [SerializeField] private Text playerCurrentExpText;
 
-    // Start is called before the first frame update
+    void Awake()
+    {
+        GameEvents.onPause += GameEvents_onPause;
+        GameEvents.onResume += GameEvents_onResume;
+    }
+
+    private void GameEvents_onResume()
+    {
+        gameObject.SetActive(true);
+    }
+
+    private void GameEvents_onPause()
+    {
+        gameObject.SetActive(false);
+    }
+
     private void Start()
     {
         playerCurrentExp.runtimeValue = 0;
